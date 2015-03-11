@@ -1,0 +1,997 @@
+{% load dashboard_extras %}
+{% load switch_case %}
+{% load device_count_in_zone %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>BEMOSS Dashboard</title>
+<!--
+
+# Authors: Kruthika Rathinavel
+# Version: 1.2.1
+# Email: kruthika@vt.edu
+# Created: "2014-10-13 18:45:40"
+# Updated: "2015-02-13 15:06:41"
+
+
+Copyright © 2014 by Virginia Polytechnic Institute and State University
+All rights reserved
+
+Virginia Polytechnic Institute and State University (Virginia Tech) owns the copyright for the BEMOSS software and its
+associated documentation ("Software") and retains rights to grant research rights under patents related to
+the BEMOSS software to other academic institutions or non-profit research institutions.
+You should carefully read the following terms and conditions before using this software.
+Your use of this Software indicates your acceptance of this license agreement and all terms and conditions.
+
+You are hereby licensed to use the Software for Non-Commercial Purpose only.  Non-Commercial Purpose means the
+use of the Software solely for research.  Non-Commercial Purpose excludes, without limitation, any use of
+the Software, as part of, or in any way in connection with a product or service which is sold, offered for sale,
+licensed, leased, loaned, or rented.  Permission to use, copy, modify, and distribute this compilation
+for Non-Commercial Purpose to other academic institutions or non-profit research institutions is hereby granted
+without fee, subject to the following terms of this license.
+
+Commercial Use: If you desire to use the software for profit-making or commercial purposes,
+you agree to negotiate in good faith a license with Virginia Tech prior to such profit-making or commercial use.
+Virginia Tech shall have no obligation to grant such license to you, and may grant exclusive or non-exclusive
+licenses to others. You may contact the following by email to discuss commercial use:: vtippatents@vtip.org
+
+Limitation of Liability: IN NO EVENT WILL VIRGINIA TECH, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF VIRGINIA TECH OR OTHER PARTY HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+For full terms and conditions, please visit https://bitbucket.org/bemoss/bemoss_os.
+
+Address all correspondence regarding this license to Virginia Tech's electronic mail address:: vtippatents@vtip.org
+
+
+    -->
+    <meta http-equiv="refresh" content="100">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<!-- Bootstrap -->
+<link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="/static/css/thin-admin.css" rel="stylesheet" media="screen">
+<link href="/static/css/font-awesome.css" rel="stylesheet" media="screen">
+<link media="screen" rel="stylesheet" href="/static/font-awesome-4.0.3/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="/static/css/fam-icons/fam-icons.css">
+<link href="/static/style/style.css" rel="stylesheet">
+<link href="/static/style/dashboard.css" rel="stylesheet">
+<!-- Testing Sortable -->
+<link href="/static/css/jquery-ui.css" rel="stylesheet">
+<script class="include" type="text/javascript" src="/static/javascript/jquery-1.10.2.js"></script>
+<script class="include" type="text/javascript" src="/static/javascript/jquery-ui.js"></script>
+
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+
+<!-- Notify CSS -->
+<link href="/static/css/bootstrap-notify/bootstrap-notify.css" rel="stylesheet">
+
+<!-- Custom Styles -->
+<link href="/static/css/bootstrap-notify/styles/alert-bangtidy.css" rel="stylesheet">
+<link href="/static/css/bootstrap-notify/styles/alert-blackgloss.css" rel="stylesheet">
+
+<!-- <script class="include" type="text/javascript" src="/static/javascript/jquery.min.js"></script> --> 
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.min.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/bootstrap-notify.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/dashboard.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/common_fn.js"></script>
+<script class="include" type="text/javascript" src="/static/javascript/gauge.min.js"></script>
+<!--[if IE]><script type="text/javascript" src="/static/assets/jqueryknobdial/excanvas.js"></script><![endif]-->
+
+
+</head>
+<body>
+          <div class='notifications top-right'></div>
+          <div class='notifications bottom-right'></div>
+          <div class='notifications top-left'></div>
+          <div class='notifications bottom-left'></div>
+<div class="container">
+  <div class="top-navbar header b-b"> <a data-original-title="Toggle navigation" class="toggle-side-nav pull-left" href="#"><i class="icon-reorder"></i> </a>
+    <div class="brand pull-left"> <a href="/home/"><img src="/static/images/logo.png" width="147" height="33"></a></div>
+    <ul class="nav navbar-nav navbar-right  hidden-xs">
+      
+      
+      <li class="dropdown user  hidden-xs"> <a data-toggle="dropdown" class="dropdown-toggle" href="#"> <i class="icon-male"></i> <span class="username">{{ user }}</span> <i class="icon-caret-down small"></i> </a>
+        <ul class="dropdown-menu">
+          <!--<li><a href="user_profile.html"><i class="icon-user"></i> My Profile</a></li>
+          <li><a href="fullCalendar.html"><i class="icon-calendar"></i> My Calendar</a></li>
+          <li><a href="#"><i class="icon-tasks"></i> My Tasks</a></li>
+          <li class="divider"></li>-->
+          <li><a href="/logout/"><i class="icon-key"></i> Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+
+  </div>
+</div>
+<div class="wrapper">
+{% include 'side_nav.html' %}
+  <div class="page-content" id="dashboard_content">
+    <form action="../" method="post">
+  	{% csrf_token %}
+    <div class="content container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h2 class="page-title">Dashboard</h2>
+        </div>
+      </div>
+      <div class="row" id="#unassigned_devices">
+      	<div class="col-lg-1"></div>
+        <div class="col-lg-10">
+
+          <div class="widget">
+            <div class="widget-header"> <i class="icon-bookmark"></i>
+              <h3>Discovered Devices</h3>
+            </div>
+            <!-- /widget-header -->
+            <div class="widget-content connectedSortable" id="sortable1">
+              <!-- <div class="shortcuts"> --> 
+               {%for element in devices%}
+                {% if element.zone.id == 999 %}
+              		 
+								{% switch element.device_type_id %}
+						            {% case '1TH' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/tstat/{{element.mac_address}}" class="stats-container" style="background-color:rgba(40,36,139,1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            	<h2></h2>
+				                		<div id="preview">
+						            	<div class="text-center">
+						            	<canvas class="thermo_gauge" id="gauge_{{element.id}}" width=150 height=100></canvas>
+						            	<div id="{{element.id}}-textfield" style = "margin-top: -90px;"></div>
+						            	</div>
+						            	<div class="text-center">	
+						            	<div id="unit" style = "font-size:12px; margin-top: 0px;">&deg;F</div>
+						            	<div class="text-center">	<h4 id="{{element.id}}_chvalue">{{element.current_status.temperature}}</h4>
+						            	<h4 style = "font-size:12.7px; margin-top: 16.5px;" id="{{element.id}}_tmode">{{element.current_status.mode}}</h4></div>
+						            	</div>
+						            </div>
+						                <div class="text-center" style = "margin-top: 20px;"><h5>{{element.device_type}}</h5>	</div>
+						                <div class="text-center"><h5>Set Point:{{element.current_status.setpoint}}&deg;F</h5></div>
+                                         <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+								              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+					              		</a>
+					              		</div>
+						            {% case '2DB' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/light/{{element.mac_address}}" class="stats-container" style="background-color:rgba(96, 99, 192, 1)"> 
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+                                         <div class="text-center"><h1>   <img src="/static/images/bulbon.png" width="45" height="70" alt="ON" style="-webkit-filter:brightness(1.5);"></h1></div>
+						                <!--<div class="text-center"><h1><img src="/static/images/bulbon.png" width="50" height="80" alt="{{element.current_status.on_off_status}}"></h1></div>-->
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/bulboff.png" width="50" height="80" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <small style = "margin-top: 20px;">{{element.device_type}} </small>
+						                <div class="text-center" style = "margin-bottom:22px;"><h5>Illuminated to : {{element.current_status.dim_percent}}%</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+						            {% case '2HUE' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/light/{{element.mac_address}}" class="stats-container" style="background-color:rgba(96, 99, 192, 1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						            	<h5  class="hue" id="{{element.id}}_lights">{{ element.current_status.multiple_on_off}}</h5>
+						            	 <div class="text-center" id="huelights_{{element.id}}"></div>
+						            	<!-- {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/bulbon.png" width="90" height="80" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/bulboff.png" width="90" height="80" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %} -->
+						                <div class="text-center" style = "margin-top: 20px; "><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom:25px;"><h5>{{ element.current_status.multiple_on_off|length}} Connected Lights</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+						            {% case '2SDB' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/light/{{element.mac_address}}" class="stats-container" style="background-color:rgba(96, 99, 192, 1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/bulbon.png" width="45" height="70" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/bulboff.png" width="45" height="70" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <small  style = "margin-top: 20px;">{{element.device_type}} </small>
+						                <div class="text-center" style = "margin-bottom:22px;"><h5>Illuminated to : {{element.current_status.dim_percent}}</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+						            {% case '2WL' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/light/{{element.mac_address}}" class="stats-container" style="background-color:rgba(96, 99, 192, 1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+									            <h2></h2>
+						               {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/wemoon.jpg" width="70" height="100" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/wemooff.jpg" style="-webkit-filter:opacity(30%);" width="70" height="100"alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <div class="text-center" style = "margin-top: 0px;"><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-top: 5px; margin-bottom:-10px;"><h5>Status: {{element.current_status.on_off_status}}</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+                                    {% case '2WSL' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/light/{{element.mac_address}}" class="stats-container" style="background-color:rgba(96, 99, 192, 1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" >
+									            <h2></h2>
+						               {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/wattstopper_on.png" width="100" height="100" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/wattstopper_off.png" style="-webkit-filter:opacity(30%);" width="100" height="100"alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <div class="text-center" style = "margin-top: 0px;"><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-top: 5px; margin-bottom:-10px;"><h5>Status: {{element.current_status.on_off_status}}</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+						            {% case '3WSP' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/plug/{{element.mac_address}}" class="stats-container" style="background-color:rgba(110,111,139,1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+						               <div class="text-center"><img src="/static/images/wemo_plug.png" width="70" height="100" alt="{{element.current_status.on_off_status}}"></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/wemo_plug.png" style="-webkit-filter:opacity(30%);" width="70" height="100" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <div class="text-center" style = "margin-top: 15px; "><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom:-10px;"><h5>Status: {{element.current_status.on_off_status}}</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+                                    {% case '3WP' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/plug/{{element.mac_address}}" class="stats-container" style="background-color:rgba(110,111,139,1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" >
+									            <h2></h2>
+						               {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/wattstopper_on.png" width="100" height="100" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/wattstopper_off.png" style="-webkit-filter:opacity(30%);" width="100" height="100" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <div class="text-center" style = "margin-top: 0px;"><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-top: 5px; margin-bottom:-10px;"><h5>Status: {{element.current_status.power}} W</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+						            {% case '3MOD' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/plug/{{element.mac_address}}" class="stats-container" style="background-color:rgba(110,111,139,1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+						               <div class="text-center"><img src="/static/images/plugon.png" width="100" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/plugoff.png" width="100" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <small>{{element.device_type}} </small>
+						                <div class="text-center"><h5>Power: {{ element.current_status.power }} kW</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+						            {% case '3VTH' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/plug/{{element.mac_address}}" class="stats-container" style="background-color:rgba(110,111,139,1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						            	<h5  class="vthem" id="{{element.id}}_ldctrl">{{ element.current_status.multiple_on_off}}</h5>
+						            	 <div class="text-center" id="vth_{{element.id}}"></div>
+						                <!-- {% if element.current_status.on_off_status == 'ON' %}
+						               <div class="text-center"><img src="/static/images/plugon.png" width="100" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/plugoff.png" width="100" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %} -->
+						                <div class="text-center" style = "margin-top: 30px;"><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom: 15px;"><h5>Power: {{ element.current_status.power }} kW</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</div>
+						            {% case '3DSP' %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="/plug/{{element.mac_address}}" class="stats-container" style="background-color:rgba(110,111,139,1)">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            	<h2></h2>
+						            	{% if element.current_status.on_off_status == 'ON' %}
+						               <div class="text-center"><img src="/static/images/xBee.png" width="80" height="95" alt="{{element.current_status.on_off_status}}"></div>
+						               <div class="text-center" style = "margin-top: 0px; "><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom:-25px;"><h5>Power: {{ element.current_status.power }} W</h5></div>
+                                            <div class="text-center"  style = "margin-bottom:-20px;"> <button class="btn btn-warning btn-xs identify" id="identify-{{ element.id }}"><i class="icon-search"></i> Identify Device</button></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/xBee.png" style="-webkit-filter:opacity(30%);" width="80" height="95" alt="{{element.current_status.on_off_status}}"></div>
+						               <div class="text-center" style = "margin-top: 15px;"><h5>{{element.device_type}}</h5></div>
+						               <div class="text-center" style = ""><h5>Power: {{ element.current_status.power }} W</h5></div>
+						              <div class="text-center" style="height: 1px;margin-top: -5px; margin-bottom:22px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+			              			
+						                {% endif %} </div><div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+              						</a>
+              						</div>
+						            {% else %}
+						            <div class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+						            <a href="#" class="stats-container">
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            	<div class="text-center"><i class="fa fa-refresh"></i></div>
+						            	<small>{{element.device_type}}</small>
+                                          <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						            	</div>
+			              			<div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+              						</a>
+              						</div>
+					          {% endswitch %}
+			                <!-- </div>
+			              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+              		</a> -->
+              		
+              	<div style="display: none;" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" class="modal fade" id="{{ element.id }}">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+                        <h4 id="myModalLabel" class="modal-title">{{element.nickname}} Information</h4>
+                      </div>
+                      <div class="modal-body">
+                         <table class="table table-condensed">
+			                <thead>
+				                <tr>
+				                <th></th>
+				                <th></th>
+				                <th></th>
+			                	</tr>
+			                </thead>
+			                <tbody>
+			                  <tr>
+			                    <td>Device Nickname</td>
+			                    <td id="{{element.id}}_nick">{{element.nickname}}</td>
+			                    <td><a href="javascript:" class="nickname_edit" ><i class="icon-small icon-edit" id="{{element.id}}_nick_edit"></i></a></td>
+			                    <script>
+			                    $( "#{{element.id}}_nick_edit" ).click(function() {
+			                    	//alert("testing");
+			                    	var newtest = document.getElementById(this.id.replace("_edit",""));
+			                    	newtest.innerHTML = '<input type="text" id="{{element.id}}_nickname" placeholder="{{element.nickname}}"></input>'
+			                    });
+			                    </script>
+			                  </tr>
+			                  <tr>
+			                    <td>Zone</td>
+			                    <td>{{element.zone.zone_nickname}}</td>
+			                    <td></td>
+			                  </tr>
+			                  <tr>
+			                    <td>Device Type	</td>
+			                    <td>{{element.device_type}}</td>
+			                    <td></td>
+			                  </tr>
+			                  <tr>
+			                    <td>Vendor Name</td>
+			                    <td>{{element.vendor_name}}</td>
+			                    <td></td>
+			                  </tr>
+                              <tr>
+			                    <td>Device Model</td>
+			                    <td>{{element.device_model}}</td>
+			                    <td></td>
+			                  </tr>
+			                  <tr>
+			                  	<td>MAC Address</td>
+			                    <td>{{element.mac_address}}</td>
+			                    <td></td>
+			                  </tr>
+			                </tbody>
+			              </table>
+			              <!--<p class = "attribution">To assign a <em>Zone</em> to your device, drag your device to the corresponding zone.</p>-->
+                          <p class = "attribution">The nickname should contain 6 to 10 characters (alphabets/numbers). No spaces or special characters.</p>
+                          <p class = "attribution" id="viewediterror_{{element.id}}" style="color:red;"></p>
+                      </div>
+                      <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                        <button class="btn btn-primary save_changes" id="#savechanges-{{element.id}}" type="button">Save changes</button>
+                      </div>
+                    </div>
+                    <!-- /.modal-content --> 
+                  </div>
+                  <!-- /.modal-dialog --> 
+                </div>	
+              	{% endif %}
+               {% endfor %}
+             	<!-- </div> -->
+              <!-- /shortcuts --> 
+            </div>
+            <!-- /widget-content --> 
+          </div>
+        
+        </div>
+      </div>
+       
+      <!--<div class="row" id="#zoned_device_listing">
+      	<div class="col-lg-1"></div>
+        <div class="col-lg-10">
+          <div class="widget">
+            <div class="widget-header"> <i class="icon-bookmark"></i>
+              <h3>Zones and Devices</h3>
+            </div>
+            <div class="widget-content">
+            <div class="row">
+            <div class="col-lg-3"></div><div class="col-lg-4">
+            <input class="form-control todo-search pull-right" type="text" id="add_new_zone" placeholder="Enter your new zone name" maxlength="20"></input></div>
+            <div class="col-lg-4"><a class="btn btn-warning" href="javascript:;" id="add_new_zone_submit" >Add New Zone</a>
+            </div>
+            <div class="col-lg-3"></div>
+            </div>
+            <br/>
+			<div class="text-center"><p class="attribution" id="newzoneerror" style="color:yellow;background-color:rgba(243, 232, 232, 0.4);"></p></div>
+           <br/>
+              <div id="accordion2" class="panel-group zoneSortable">
+              <script>
+               </script>
+              {% if zones %}
+              {% if zones|length <= 1 %}
+              {% for elem in zones %}
+              	{% if elem.id == 999 %}
+              		<p> There are no zones configured. </p>
+              	{% endif %}
+              {% endfor %}
+              {% endif %}
+              {% for elem in zones %}
+              {% if elem.id != 999 %}
+              	<div class="panel" id="sortable_{{elem.id}}">
+                  <div class="panel-heading">
+                  <p><a href="#collapse_{{elem.id}}"  data-toggle="collapse" class="accordion-toggle collapsed" id="{{elem.id}}_nick_dp"> {{ elem.zone_nickname }} </a> 
+                  &nbsp;&nbsp;&nbsp;<i id="{{elem.id}}_znedit" class="icon-pencil" data-backdrop="false" data-target="#{{ elem.id }}_znmodal" data-toggle="modal"></i>
+                  </p></div>
+                  	<div style="display: none;" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" class="modal fade" id="{{ elem.id }}_znmodal">
+	                  <div class="modal-dialog">
+	                    <div class="modal-content">
+	                      <div class="modal-header">
+	                        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+	                        <h4 id="myModalLabel" class="modal-title">Edit Zone Information</h4>
+	                      </div>
+                      <div class="modal-body">
+                         <table class="table table-condensed">
+			                <thead>
+				                <tr>
+				                <th></th>
+				                <th></th>
+				                <th></th>
+			                	</tr>
+			                </thead>
+			                <tbody>
+			                  <tr>
+			                    <td>Zone Nickname</td>
+			                    <td id="{{elem.id}}_znick">{{ elem.zone_nickname }}</td>
+			                    <td><a href="javascript:;" class="znickname_edit" ><i class="icon-small icon-edit" id="{{elem.id}}_znick_edit"></i></a></td>
+			                    <script>
+			                    $( "#{{elem.id}}_znick_edit" ).click(function() {
+			                    	//alert("testing");
+			                    	var newtest = document.getElementById(this.id.replace("_edit",""));
+			                    	newtest.innerHTML = '<input type="text" id="{{elem.id}}_znickname" placeholder="{{elem.zone_nickname}}"></input>'
+			                    });
+			                    </script>
+			                  </tr>
+			                </tbody>
+			              </table>
+
+			              <p class="attribution">Note: Nickname can only contain letters and numbers and cannot exceed more than 15 characters.</p>
+			               <p class = "attribution" id="zonenickname_{{elem.id}}" style="color:red;"></p>
+                      </div>
+                      <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                        <button class="btn btn-primary save_changes_zn" id="#savechanges-{{elem.id}}" type="button">Save changes</button>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                   <div style="height: 1px;" class="panel-collapse collapse " id="collapse_{{elem.id}}"> 
+                  <ul class="panel-body connectedSortable" id="panelbody_{{elem.id}}">
+                <script>
+
+    		    	$(".panel-body").droppable().sortable({
+    		    	dropOnEmpty: true,
+    		        connectWith: ".connectedSortable"
+    		    }).disableSelection();
+
+              	</script>
+                    {% for element in devices %}
+                    {% if element.zone.id == elem.id %}
+
+				          
+					         {% switch element.device_type_id %}
+						            {% case '1TH' %}
+									<li class="col-md-3 col-xs-12 col-sm-6 device_view " id="{{element.id}}_divopen" style="height:280px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            	<h2></h2>
+				                		<div id="preview">
+						            	<div class="text-center">
+						            	<canvas class="thermo_gauge" id="gauge_{{element.id}}" width=150 height=100></canvas>
+						            	<div id="{{element.id}}-textfield" style = "margin-top: -90px;"></div>
+						            	</div>
+						            	<div class="text-center">	
+						            	<div id="unit" style = "font-size:12px; margin-top: 0px;">&deg;F</div>
+						            	<div class="text-center">	<h4 id="{{element.id}}_chvalue">{{element.current_status.temperature}}</h4>
+						            	<h4 style = "font-size:12.7px; margin-top: 16.5px;" id="{{element.id}}_tmode">{{element.current_status.mode}}</h4></div>
+						            	</div>
+						            </div>
+						                <div class="text-center" style = "margin-top: 20px; "><h5>{{element.device_type}}</h5>	</div>
+						                <div class="text-center" style = "margin-bottom: 11px;"><h5>Set Point:{{element.current_status.setpoint}}&deg;F</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '2DB' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:300px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/bulbon.png" width="90" height="80" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/bulboff.png" width="90" height="80" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <small>{{element.device_type}} </small>
+						                <div class="text-center"><h5>Illuminated to : {{element.current_status.dim_percent}}</h5></div>
+                                  <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '2HUE' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:300px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						            	<h5  class="hue" id="{{element.id}}_lights">{{ element.current_status.multiple_on_off}}</h5>
+						            	 <div class="text-center" id="huelights_{{element.id}}"></div>
+						                <div class="text-center" style = "margin-top: 20px; "><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom:25px;"><h5>{{ element.current_status.multiple_on_off|length}} Connected Lights</h5></div>
+                                  <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '2SDB' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:300px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/bulbon.png" width="90" height="80" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/bulboff.png" width="90" height="80" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <small>{{element.device_type}} </small>
+						                <div class="text-center"><h5>Illuminated to : {{element.current_status.dim_percent}}</h5></div>
+                                  <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '2WL' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:300px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						               {% if element.current_status.on_off_status == 'ON' %}
+						                <div class="text-center"><h1><img src="/static/images/wemoon.jpg" width="70" height="100" alt="{{element.current_status.on_off_status}}"></h1></div>
+						                {% else %}
+						                <div class="text-center"><img src="/static/images/wemooff.jpg" style="-webkit-filter:opacity(30%);" width="70" height="100"alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <div class="text-center" style = "margin-top: 0px;"><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-top: 5px; margin-bottom:-7px;"><h5>Status: {{element.current_status.on_off_status}}</h5></div>
+                                  <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '3WSP' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+						               <div class="text-center"><img src="/static/images/wemo_plug.png" width="70" height="100" alt="{{element.current_status.on_off_status}}"></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/wemo_plug.png" style="-webkit-filter:opacity(30%);" width="70" height="100" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <div class="text-center" style = "margin-top: 15px; "><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom:-6px;"><h5>Status: {{element.current_status.on_off_status}}</h5></div>
+                                  <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '3MOD' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.on_off_status == 'ON' %}
+						               <div class="text-center"><img src="/static/images/plugon.png" width="100" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/plugoff.png" width="100" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                <small>{{element.device_type}} </small>
+						                <div class="text-center"><h5>Power: {{ element.current_status.power }} kW</h5></div>
+                                  <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '3VTH' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+			                    		<a href="#" class="stats-container" >
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						            	<h5  class="vthem" id="{{element.id}}_ldctrl">{{ element.current_status.multiple_on_off}}</h5>
+						            	 <div class="text-center" id="vth_{{element.id}}"></div>
+						                <div class="text-center" style = "margin-top: 30px;"><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom: 16px;"><h5>Power: {{ element.current_status.power }} kW</h5></div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '3DSP' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						            	{% if element.current_status.on_off_status == 'ON' %}
+						               <div class="text-center"><img src="/static/images/xBee.png" width="80" height="95" alt="{{element.current_status.on_off_status}}"></div>
+						               <div class="text-center" style = "margin-top: 3px; "><h5>{{element.device_type}}</h5></div>
+						                <div class="text-center" style = "margin-bottom:13px;"><h5>Power: {{ element.current_status.power }} kkW</h5></div>
+                                            <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/xBee.png" style="-webkit-filter:opacity(30%);" width="80" height="95" alt="{{element.current_status.on_off_status}}"></div>
+						               <div class="text-center" style = "margin-top: 3px;"><h5>{{element.device_type}}</h5></div>
+						               <div class="text-center" style = "margin-bottom: 13px;"><h5>Power: {{ element.current_status.power }} kW</h5></div>
+                                            <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                {% endif %}
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '4PRM' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                {% if element.current_status.motion == 'IN' %}
+						               <div class="text-center"><img src="/static/images/occupied.png" width="90" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% else %}
+						               <div class="text-center"><img src="/static/images/unoccupied.png" width="90" height="90" alt="{{element.current_status.on_off_status}}"></div>
+						                {% endif %}
+						                
+						                <div class="text-center" style = "margin-top: 15px; margin-bottom:30px;"><h5>{{element.device_type}}</h5></div>
+                                  <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						                </div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '5WTN' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+			                    		<a href="#" class="stats-container" >
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            <h2></h2>
+						            <div id="preview">
+						            	<div class="text-center">
+						            	<canvas class="powermeter" id="chart_{{element.id}}" width=132 height=80></canvas>
+						            	<div id="{{element.id}}-textfield" style = "margin-top: -70px;"></div>
+						            	</div>
+						            	<div class="text-center">	
+						            	<div id="unit" style = "font-size:12px; margin-top: 0px;">kW</div>
+						            	<div class="text-center">	<h4 id="{{element.id}}_chvalue">{{element.current_status.power}}</h4></div>
+						            	</div>
+						            </div>
+						            	<div class="text-center" style = "margin-top: 40px;"><h5>{{element.device_type}}</h5>	</div>
+                                          <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						            	</div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% case '5DNT' %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            	<h2></h2>
+						            <div id="preview">
+						            	<div class="text-center">
+						            	<canvas class="powermeter" id="chartd_{{element.id}}" width=132 height=80></canvas>
+						            	<div id="{{element.id}}-textfield" style = "margin-top: -70px;"></div>
+						            	</div>
+						            	<div class="text-center">	
+						            	<div id="unit" style = "font-size:12px; margin-top: 0px;">kW</div>
+						            	<div class="text-center">	<h4 id="{{element.id}}_chvalue">{{element.current_status.power}}</h4></div>
+						            	</div>
+						            </div>
+						            	<div class="text-center" style = "margin-top: 35px; margin-bottom:47px;"><h5>{{element.device_type}}</h5>	</div>
+                                      <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						            	</div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						           	{% case '4DIS' %}
+						           	<li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+		                    		<a href="#" class="stats-container" >
+					              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+					              <div class="stats-body-alt" > 
+						            <h2></h2>
+						                <div id="preview" style="position: relative;width: 450px;margin-top:55px;margin-bottom:40px;">
+						            	<div class="text-center">
+						            	<div style="position: absolute;width: 150px;left: 0;">
+						            	<canvas class="thsens_gauge" style = "margin-top: -30px;margin-bottom: 10px;" id="chart1_{{element.id}}" width=132 height=80 ></canvas>
+						            	<div id="{{element.id}}-ttextfield" style = "margin-top: -80px;" ></div>
+						            	</div>
+						            	<div style="position: absolute;width: 300px;left: 75px;">
+						            	<canvas class="humidsens_gauge" style = "margin-top: -30px;margin-bottom: 10px;" id="chart_{{element.id}}" width=132 height=80></canvas>
+						            	<div id="{{element.id}}-htextfield" style = "margin-top: -75px;"></div>
+						            	</div>
+						            	<div style="position: absolute;width: 450px;left: 150px;">
+						            	<canvas class="lightsens_gauge" style = "margin-top: -30px;margin-bottom: 10px;" id="chart2_{{element.id}}" width=132 height=80></canvas>
+						            	<div id="{{element.id}}-ltextfield" style = "margin-top: -75px;"></div>
+						            	</div>
+						            	</div>
+						            	<div class="text-center">	
+						            	<div id="tunit" style = "font-size:12px; margin-top: 14px;position: absolute;width: 150px;left: 0;">&deg;F</div>
+						            	<div style = "font-size:12px; margin-top: 47px;position: absolute;width: 150px;left: 0;">Temperature</div>
+						            	<div id="hunit" style = "font-size:12px; margin-top: 18px;position: absolute;width: 300px;left: 75px;">%</div>
+						            	<div style = "font-size:12px; margin-top: 47px;position: absolute;width: 300px;left: 75px;">Humidity</div>
+						            	<div id="lunit" style = "font-size:12px; margin-top: 18px;position: absolute;width: 450px;left: 150px;">lux</div>
+						            	<div style = "font-size:12px; margin-top: 47px;position: absolute;width: 450px;left: 150px;"">Light Intensity</div>
+						            	<div class="text-center">	
+						            		<h4 id="{{element.id}}_tvalue">{{element.current_status.temperature}}</h4>
+						            		<h4 id="{{element.id}}_hvalue">{{element.current_status.humidity}}</h4>
+						            		<h4 id="{{element.id}}_lvalue">{{element.current_status.light_intensity}}</h4>
+						            	</div>
+						            	</div>
+						            </div>
+						             <div class="text-center" style = "margin-top:138px; margin-bottom:20px;"><h5>{{element.device_type}}</h5></div>
+                                        <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+						            {% else %}
+						            <li class="col-md-3 col-xs-12 col-sm-6 device_view" id="{{element.id}}_divopen" style="height:280px;">
+			                    		<a href="#" class="stats-container" >
+						              <div class="stats-heading" id="{{element.id}}_nickname_header">{{element.nickname}}</div>
+						              <div class="stats-body-alt" > 
+						            	<div class="text-center"><i class="fa fa-refresh"></i></div>
+						            	<small>{{element.device_type}}</small>
+                                          <div class="text-center" style="height: 23px;"> <button class="btn btn-warning btn-xs identify" style="margin-top: -40px; margin-bottom: 7px" id="identify-{{ element.id }}"><i class="icon-search" id="{{ element.id }}-spin"></i> Identify Device</button></div>
+						            	</div>
+							              <div class="stats-footer text-center" data-backdrop="false" data-target="#{{ element.id }}" data-toggle="modal">View/Edit Information</div>
+				              		</a>
+				              		</li>
+					          {% endswitch %}
+
+	              	<div style="display: none;" aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" class="modal fade" id="{{ element.id }}">
+	                  <div class="modal-dialog">
+	                    <div class="modal-content">
+	                      <div class="modal-header">
+	                        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+	                        <h4 id="myModalLabel" class="modal-title">{{element.nickname}} Information</h4>
+	                      </div>
+                      <div class="modal-body">
+                         <table class="table table-condensed">
+			                <thead>
+				                <tr>
+				                <th></th>
+				                <th></th>
+				                <th></th>
+			                	</tr>
+			                </thead>
+			                <tbody>
+			                  <tr>
+			                    <td>Device Nickname</td>
+			                    <td id="{{element.id}}_nick">{{element.nickname}}</td>
+			                    <td><a href="javascript:;" class="nickname_edit" ><i class="icon-small icon-edit" id="{{element.id}}_nick_edit"></i></a></td>
+			                    <script>
+			                    $( "#{{element.id}}_nick_edit" ).click(function() {
+			                    	var newtest = document.getElementById(this.id.replace("_edit",""));
+			                    	newtest.innerHTML = '<input type="text" id="{{element.id}}_nickname" placeholder="{{element.nickname}}"></input>'
+			                    });
+			                    </script>
+			                  </tr>
+			                  <tr>
+			                    <td>Zone</td>
+			                    <td id={{elem.id}}_ztdnick>{{element.zone.zone_nickname}}</td>
+			                    <td></td>
+			                  </tr>
+			                  <tr>
+			                    <td>Device Type	</td>
+			                    <td>{{element.device_type}}</td>
+			                    <td></td>
+			                  </tr>
+			                  <tr>
+			                    <td>Device Name</td>
+			                    <td>{{element.device_name}}</td>
+			                    <td></td>
+			                  </tr>
+			                  <tr>
+			                  	<td>MAC Address</td>
+			                    <td>{{element.mac_address}}</td>
+			                    <td></td>
+			                </tbody>
+			              </table>
+
+			              <p class="attribution">Note: Nickname can only contain letters and numbers and cannot exceed more than 15 characters.</p>
+			               <p class = "attribution" id="viewediterror_{{element.id}}" style="color:red;"></p>
+                      </div>
+                      <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                        <button class="btn btn-primary save_changes" id="#savechanges-{{element.id}}" type="button">Save changes</button>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+                    {% endif %}
+                    {% endfor %}
+</ul>
+</div>
+                  </div>
+               {% endif %}
+              {% endfor %}
+                    </div>
+                {%endif%}
+              </div>
+              
+            </div>
+          </div>
+        </div>-->
+        <div class="col-lg-1"></div>
+      </div>
+       <!--<div class="row">
+	<div class="col-lg-4"></div>
+     <div class="col-lg-4">
+          <div class="widgetcontainer">
+
+              <div class="todo-action-bar"> 
+                <div class="row">
+                   <div class="text-center"><button type="button" class="btn btn-default btn-danger"  id="submit_dashboard_changes"><i class="icon-ok"></i> Submit All Changes</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+</div>-->
+      
+
+  </form>
+    
+  </div>
+  
+</div>
+
+<div class="bottom-nav footer"> 2013-2015 &copy;: Building Energy Management Open Source Software. </div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script src="/static/js/jquery.js"></script> 
+<script src="/static/js/bootstrap.min.js"></script> 
+<script type="text/javascript" src="/static/js/left_nav_slider.js"></script>
+
+<!--switcher html start-->
+<div class="demo_changer" style="right: -145px;">
+                <div class="demo-icon"></div>
+                <div class="form_holder">
+                        
+
+                    <div class="predefined_styles">
+                        <a class="styleswitch" rel="a" href=""><img alt="" src="/static/images/a.jpg"></a>	
+                        <a class="styleswitch" rel="b" href=""><img alt="" src="/static/images/b.jpg"></a>
+                        <a class="styleswitch" rel="c" href=""><img alt="" src="/static/images/c.jpg"></a>
+                        <a class="styleswitch" rel="d" href=""><img alt="" src="/static/images/d.jpg"></a>
+                        <a class="styleswitch" rel="e" href=""><img alt="" src="/static/images/e.jpg"></a>
+                        <a class="styleswitch" rel="f" href=""><img alt="" src="/static/images/f.jpg"></a>
+                        <a class="styleswitch" rel="g" href=""><img alt="" src="/static/images/g.jpg"></a>
+                        <a class="styleswitch" rel="h" href=""><img alt="" src="/static/images/h.jpg"></a>
+                        <a class="styleswitch" rel="i" href=""><img alt="" src="/static/images/i.jpg"></a>
+                        <a class="styleswitch" rel="j" href=""><img alt="" src="/static/images/j.jpg"></a>
+                        <a class="styleswitch" rel="b1" href=""><img alt="" src="/static/images/b1.jpg"></a>
+                        <a class="styleswitch" rel="k" href=""><img alt="" src="/static/images/k.jpg"></a>
+                        <a class="styleswitch" rel="l" href=""><img alt="" src="/static/images/l.jpg"></a>
+                        <a class="styleswitch" rel="m" href=""><img alt="" src="/static/images/m.jpg"></a>
+                        <a class="styleswitch" rel="n" href=""><img alt="" src="/static/images/n.jpg"></a>
+                        <a class="styleswitch" rel="o" href=""><img alt="" src="/static/images/o.jpg"></a>
+                        <a class="styleswitch" rel="p" href=""><img alt="" src="/static/images/p.jpg"></a>
+                        <a class="styleswitch" rel="q" href=""><img alt="" src="/static/images/q.jpg"></a>
+                        <a class="styleswitch" rel="r" href=""><img alt="" src="/static/images/r.jpg"></a>
+                        <a class="styleswitch" rel="s" href=""><img alt="" src="/static/images/s.jpg"></a>
+                        <a class="styleswitch" rel="t" href=""><img alt="" src="/static/images/t.jpg"></a>
+                        <a class="styleswitch" rel="u" href=""><img alt="" src="/static/images/u.jpg"></a>
+                    </div>
+					                    
+                </div>
+            </div>
+            
+            
+    <!--switcher html end-->
+<script src="/static/assets/switcher/switcher.js"></script> 
+<script src="/static/assets/switcher/moderziner.custom.js"></script> 
+<link href="/static/assets/switcher/switcher.css" rel="stylesheet">
+<link href="/static/assets/switcher/switcher-defult.css" rel="stylesheet">
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/a.css" title="a" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/b.css" title="b" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/c.css" title="c" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/d.css" title="d" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/e.css" title="e" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/f.css" title="f" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/g.css" title="g" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/h.css" title="h" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/i.css" title="i" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/j.css" title="j" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/b1.css" title="b1" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/k.css" title="k" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/l.css" title="l" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/m.css" title="m" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/n.css" title="n" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/o.css" title="o" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/p.css" title="p" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/q.css" title="q" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/r.css" title="r" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/s.css" title="s" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/t.css" title="t" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/u.css" title="u" media="all" />
+</body>
+</html>

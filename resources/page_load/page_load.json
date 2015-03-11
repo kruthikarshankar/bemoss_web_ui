@@ -1,0 +1,302 @@
+{
+    "ambient_light_sensor": {
+        "4WLS51743353884d": {
+            "page_load": "{empty_string}"
+        }, 
+        "DayLightSensor": {
+            "page_load": {
+                "status": 400
+            }
+        }, 
+        "Sensor2": {
+            "page_load": "{empty_string}"
+        }
+    }, 
+    "lighting": {
+        "Hue": {
+            "page_load": "{empty_string}"
+        }, 
+        "Lighting1": {
+            "page_load": {
+                "brightness": 49, 
+                "color": [
+                    34, 
+                    56, 
+                    67
+                ], 
+                "saturation": 63, 
+                "status": "ON"
+            }
+        }, 
+        "Lighting2": {
+            "page_load": "{empty_string}"
+        }, 
+        "Lighting3": {
+            "page_load": "{empty_string}"
+        }, 
+        "Lighting4": {
+            "page_load": "{empty_string}"
+        }, 
+        "WattLight": {
+            "page_load": {
+                "brightness": 49, 
+                "color": [
+                    34, 
+                    56, 
+                    67
+                ], 
+                "saturation": 63, 
+                "status": "ON"
+            }
+        }, 
+        "WattstopperOcc": {
+            "page_load": "{empty_string}"
+        }, 
+        "WiFiLight5": {
+            "page_load": {
+                "brightness": 49, 
+                "color": "rgb(255,136,0)", 
+                "saturation": 63, 
+                "status": "ON"
+            }
+        }, 
+        "WifiLight5": {
+            "page_load": {
+                "brightness": 49, 
+                "color": "rgb(255,136,0)", 
+                "saturation": 63, 
+                "status": "ON"
+            }
+        }, 
+        "WifiLight6": {
+            "page_load": {
+                "brightness": 49, 
+                "color": "rgb(255,136,0)", 
+                "saturation": 63, 
+                "status": "ON"
+            }
+        }, 
+        "WifiLight8": {
+            "page_load": {
+                "brightness": 49, 
+                "color": "rgb(255,136,0)", 
+                "saturation": 63, 
+                "status": "ON"
+            }
+        }, 
+        "Wifihue": {
+            "page_load": {
+                "brightness": 49, 
+                "color": [
+                    34, 
+                    56, 
+                    67
+                ], 
+                "saturation": 63, 
+                "status": "ON"
+            }
+        }, 
+        "light1": {
+            "page_load": ""
+        }
+    }, 
+    "occupancy_sensor": {
+        "Sensor1": {
+            "page_load": {
+                "status": "IN"
+            }
+        }, 
+        "WattstopperOcc": {
+            "page_load": {
+                "status": "IN"
+            }
+        }
+    }, 
+    "plugload": {
+        "Plugg": {
+            "page_load": {
+                "power": "500", 
+                "status": "OFF"
+            }
+        }, 
+        "Plugload1": {
+            "page_load": {
+                "power": 500, 
+                "status": "OFF"
+            }
+        }, 
+        "Plugload2": {
+            "page_load": {
+                "power": 500, 
+                "status": "OFF"
+            }
+        }, 
+        "Plugload3": {
+            "page_load": {
+                "power": 500, 
+                "status": "OFF"
+            }
+        }, 
+        "WattPlug": {
+            "page_load": {
+                "power": "500", 
+                "status": "OFF"
+            }
+        }, 
+        "WiFiSwitch6": {
+            "page_load": {
+                "power": "500", 
+                "status": "OFF"
+            }
+        }, 
+        "WifiLight6": {
+            "page_load": {
+                "power": "500", 
+                "status": "OFF"
+            }
+        }, 
+        "WifiSwitch9": {
+            "page_load": {
+                "power": "500", 
+                "status": "OFF"
+            }
+        }
+    }, 
+    "power_meter": {
+        "Dent": {
+            "page_load": "{empty_string}"
+        }, 
+        "Powermeter1": {
+            "page_load": {
+                "apparent_power": 12, 
+                "current": 16, 
+                "energy": 12, 
+                "power_factor": 11, 
+                "reactive_power": 10, 
+                "real_power": 12, 
+                "voltage": 14
+            }
+        }, 
+        "Powermeter2": {
+            "page_load": "{empty_string}"
+        }
+    }, 
+    "rtu": {
+        "1RTU2c127b6cacf7": {
+            "page_load": {
+                "bypass_damper_position": 46, 
+                "cool_setpoint": 74.7, 
+                "cooling_mode": "None", 
+                "cooling_status": "OFF", 
+                "fan_status": "OFF", 
+                "heat_setpoint": 71.7, 
+                "heating": 65, 
+                "outside_damper_position": 25, 
+                "outside_temperature": 76.9, 
+                "pressure": 0.2, 
+                "return_temperature": 65.7, 
+                "supply_temperature": 75.5
+            }
+        }, 
+        "Thermostat4": {
+            "page_load": {
+                "bypass_damper_position": 89, 
+                "cool_setpoint": 56, 
+                "cooling_mode": "STG1", 
+                "cooling_status": "ON", 
+                "fan_status": "OFF", 
+                "heat_setpoint": 65, 
+                "heating": 67, 
+                "outside_damper_position": 78, 
+                "outside_temperature": 75, 
+                "pressure": 24, 
+                "return_temperature": 69, 
+                "supply_temperature": 67
+            }
+        }
+    }, 
+    "thermostat": {
+        "1THadf09": {
+            "page_load": {
+                "cool_setpoint": 65.6, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75.5, 
+                "temperature": 73.6, 
+                "thermostat_mode": "HEAT"
+            }
+        }, 
+        "1THsflkj": {
+            "page_load": "{empty_string}"
+        }, 
+        "Thermostat1": {
+            "page_load": {
+                "cool_setpoint": 65.6, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75.5, 
+                "temperature": 73.6, 
+                "thermostat_mode": "HEAT"
+            }
+        }, 
+        "Thermostat2": {
+            "page_load": {
+                "cool_setpoint": 65.6, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75.5, 
+                "override": true, 
+                "temperature": 73.6, 
+                "thermostat_mode": "HEAT"
+            }
+        }, 
+        "Thermostat4": {
+            "page_load": {
+                "cool_setpoint": 65.6, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75.5, 
+                "temperature": 73.6, 
+                "thermostat_mode": "HEAT"
+            }
+        }, 
+        "Thermostat5": {
+            "page_load": {
+                "cool_setpoint": 65.6, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75.5, 
+                "temperature": 73.6, 
+                "thermostat_mode": "HEAT"
+            }
+        }, 
+        "WiFiThermostat2": {
+            "page_load": {
+                "cool_setpoint": 65, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75, 
+                "temperature": 72, 
+                "thermostat_mode": "HEAT"
+            }
+        }, 
+        "Wifi1": {
+            "page_load": "{empty_string}"
+        }, 
+        "WifiThermostat1": {
+            "page_load": {
+                "cool_setpoint": 65, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75, 
+                "temperature": 72, 
+                "thermostat_mode": "HEAT"
+            }
+        }, 
+        "WifiThermostat2": {
+            "page_load": ""
+        }, 
+        "Wifithermostat1": {
+            "page_load": {
+                "cool_setpoint": 65, 
+                "fan_mode": "AUTO", 
+                "heat_setpoint": 75, 
+                "temperature": 72, 
+                "thermostat_mode": "HEAT"
+            }
+        }
+    }
+}

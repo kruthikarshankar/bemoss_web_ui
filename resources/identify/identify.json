@@ -1,0 +1,5 @@
+{
+    "identify_device_status_lighting": "{update_number}/{status}",
+    "identify_device_status_plugload": "{update_number}/{status}",
+    "identify_device_status_thermostat": "{update_number}/{status}"
+}

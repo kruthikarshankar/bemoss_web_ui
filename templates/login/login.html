@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login to BEMOSS</title>
+<!--
+
+# Authors: Kruthika Rathinavel
+# Version: 1.2.1
+# Email: kruthika@vt.edu
+# Created: "2014-10-13 18:45:40"
+# Updated: "2015-02-13 15:06:41"
+
+
+Copyright © 2014 by Virginia Polytechnic Institute and State University
+All rights reserved
+
+Virginia Polytechnic Institute and State University (Virginia Tech) owns the copyright for the BEMOSS software and its
+associated documentation ("Software") and retains rights to grant research rights under patents related to
+the BEMOSS software to other academic institutions or non-profit research institutions.
+You should carefully read the following terms and conditions before using this software.
+Your use of this Software indicates your acceptance of this license agreement and all terms and conditions.
+
+You are hereby licensed to use the Software for Non-Commercial Purpose only.  Non-Commercial Purpose means the
+use of the Software solely for research.  Non-Commercial Purpose excludes, without limitation, any use of
+the Software, as part of, or in any way in connection with a product or service which is sold, offered for sale,
+licensed, leased, loaned, or rented.  Permission to use, copy, modify, and distribute this compilation
+for Non-Commercial Purpose to other academic institutions or non-profit research institutions is hereby granted
+without fee, subject to the following terms of this license.
+
+Commercial Use: If you desire to use the software for profit-making or commercial purposes,
+you agree to negotiate in good faith a license with Virginia Tech prior to such profit-making or commercial use.
+Virginia Tech shall have no obligation to grant such license to you, and may grant exclusive or non-exclusive
+licenses to others. You may contact the following by email to discuss commercial use:: vtippatents@vtip.org
+
+Limitation of Liability: IN NO EVENT WILL VIRGINIA TECH, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF VIRGINIA TECH OR OTHER PARTY HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+For full terms and conditions, please visit https://bitbucket.org/bemoss/bemoss_os.
+
+Address all correspondence regarding this license to Virginia Tech's electronic mail address:: vtippatents@vtip.org
+
+
+    -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap -->
+<link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="/static/css/thin-admin.css" rel="stylesheet" media="screen">
+<link href="/static/css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="/static/style/style.css" rel="stylesheet">
+
+
+
+
+</head>
+<body>
+<div class="login-logo">
+	<img src="/static/images/logo.png" width="147" height="33"> 
+    </div>
+<br/>
+<div class="widget">
+<div class="login-content">
+  <div class="widget-content" style="padding-bottom:0;">
+  <form id="login_form" method="post" action="/login/" class="no-margin">
+			{% csrf_token %}
+  			{% if next %}
+			<input type="hidden" name="next" value="{{ next }}" />
+			{% endif %}
+                <h3 class="form-title">Login to your account</h3>
+                
+                <fieldset>
+                    <div class="form-group no-margin">
+                        <label for="email">Email</label>
+
+                        <div class="input-group input-group-lg">
+                                <span class="input-group-addon">
+                                    <i class="icon-user"></i>
+                                </span>
+                            <input type="text" placeholder="Your UserName" class="form-control input-lg" id="email" value="{{ username }}" name="username">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+
+                        <div class="input-group input-group-lg">
+                                <span class="input-group-addon">
+                                    <i class="icon-lock"></i>
+                                </span>
+                            <input type="password" placeholder="Your Password" class="form-control input-lg" id="password" name="password">
+                        </div>
+
+                    </div>
+                </fieldset>
+               <div class="form-actions text-center">
+				<!--<label class="checkbox">
+				<div class="checker"><span><input type="checkbox" value="1" name="remember"></span></div> Remember me
+				</label>
+				<button class="btn btn-warning pull-right" type="submit">
+				Login <i class="m-icon-swapright m-icon-white"></i>
+				</button>-->
+                   <button class="btn btn-warning" type="submit">
+				Login <i class="m-icon-swapright m-icon-white"></i>
+				</button>
+                <!--<div class="forgot"><a href="#" class="forgot">Forgot Username or Password?</a></div>-->
+			</div>
+            
+            
+            </form>
+  
+  
+  </div>
+   </div>
+</div>
+{% if messages %}
+{% for message in messages %}
+<div class="login-content">
+<div class="widget-content" style="padding-bottom:0;">
+<div class="text-center">{{ message }}</div>
+<br/>
+</div>
+</div>
+    {% endfor %}
+    {% endif %}
+
+
+
+
+
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script src="/static/js/jquery.js"></script> 
+<script src="/static/js/bootstrap.min.js"></script> 
+<script type="text/javascript" src="/static/js/smooth-sliding-menu.js"></script>
+
+
+
+ 
+
+<!--switcher html start-->
+<div class="demo_changer" style="right: -145px;">
+                <div class="demo-icon"></div>
+                <div class="form_holder">
+                        
+
+                    <div class="predefined_styles">
+                        <a class="styleswitch" rel="a" href=""><img alt="" src="/static/images/a.jpg"></a>	
+                        <a class="styleswitch" rel="b" href=""><img alt="" src="/static/images/b.jpg"></a>
+                        <a class="styleswitch" rel="c" href=""><img alt="" src="/static/images/c.jpg"></a>
+                        <a class="styleswitch" rel="d" href=""><img alt="" src="/static/images/d.jpg"></a>
+                        <a class="styleswitch" rel="e" href=""><img alt="" src="/static/images/e.jpg"></a>
+                        <a class="styleswitch" rel="f" href=""><img alt="" src="/static/images/f.jpg"></a>
+                        <a class="styleswitch" rel="g" href=""><img alt="" src="/static/images/g.jpg"></a>
+                        <a class="styleswitch" rel="h" href=""><img alt="" src="/static/images/h.jpg"></a>
+                        <a class="styleswitch" rel="i" href=""><img alt="" src="/static/images/i.jpg"></a>
+                        <a class="styleswitch" rel="j" href=""><img alt="" src="/static/images/j.jpg"></a>
+                        <a class="styleswitch" rel="b1" href=""><img alt="" src="/static/images/b1.jpg"></a>
+                         <a class="styleswitch" rel="k" href=""><img alt="" src="/static/images/k.jpg"></a>
+                         <a class="styleswitch" rel="l" href=""><img alt="" src="/static/images/l.jpg"></a>
+                         <a class="styleswitch" rel="m" href=""><img alt="" src="/static/images/m.jpg"></a>
+                         <a class="styleswitch" rel="n" href=""><img alt="" src="/static/images/n.jpg"></a>
+                         <a class="styleswitch" rel="o" href=""><img alt="" src="/static/images/o.jpg"></a>
+                         <a class="styleswitch" rel="p" href=""><img alt="" src="/static/images/p.jpg"></a>
+                         <a class="styleswitch" rel="q" href=""><img alt="" src="/static/images/q.jpg"></a>
+                         <a class="styleswitch" rel="r" href=""><img alt="" src="/static/images/r.jpg"></a>
+                         <a class="styleswitch" rel="s" href=""><img alt="" src="/static/images/s.jpg"></a>
+                         <a class="styleswitch" rel="t" href=""><img alt="" src="/static/images/t.jpg"></a>
+                         <a class="styleswitch" rel="u" href=""><img alt="" src="/static/images/u.jpg"></a>
+                    </div>
+
+                </div>
+            </div>
+
+
+    <!--switcher html end-->
+<script src="/static/assets/switcher/switcher.js"></script>
+<script src="/static/assets/switcher/moderziner.custom.js"></script>
+<link href="/static/assets/switcher/switcher.css" rel="stylesheet">
+<link href="/static/assets/switcher/switcher-defult.css" rel="stylesheet">
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/a.css" title="a" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/b.css" title="b" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/c.css" title="c" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/d.css" title="d" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/e.css" title="e" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/f.css" title="f" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/g.css" title="g" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/h.css" title="h" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/i.css" title="i" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/j.css" title="j" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/b1.css" title="b1" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/k.css" title="k" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/l.css" title="l" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/m.css" title="m" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/n.css" title="n" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/o.css" title="o" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/p.css" title="p" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/q.css" title="q" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/r.css" title="r" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/s.css" title="s" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/t.css" title="t" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/u.css" title="u" media="all" />
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BEMOSS - Sign Up!</title>
+<!--
+
+# Authors: Kruthika Rathinavel
+# Version: 1.2.1
+# Email: kruthika@vt.edu
+# Created: "2014-10-13 18:45:40"
+# Updated: "2015-02-13 15:06:41"
+
+
+Copyright © 2014 by Virginia Polytechnic Institute and State University
+All rights reserved
+
+Virginia Polytechnic Institute and State University (Virginia Tech) owns the copyright for the BEMOSS software and its
+associated documentation ("Software") and retains rights to grant research rights under patents related to
+the BEMOSS software to other academic institutions or non-profit research institutions.
+You should carefully read the following terms and conditions before using this software.
+Your use of this Software indicates your acceptance of this license agreement and all terms and conditions.
+
+You are hereby licensed to use the Software for Non-Commercial Purpose only.  Non-Commercial Purpose means the
+use of the Software solely for research.  Non-Commercial Purpose excludes, without limitation, any use of
+the Software, as part of, or in any way in connection with a product or service which is sold, offered for sale,
+licensed, leased, loaned, or rented.  Permission to use, copy, modify, and distribute this compilation
+for Non-Commercial Purpose to other academic institutions or non-profit research institutions is hereby granted
+without fee, subject to the following terms of this license.
+
+Commercial Use: If you desire to use the software for profit-making or commercial purposes,
+you agree to negotiate in good faith a license with Virginia Tech prior to such profit-making or commercial use.
+Virginia Tech shall have no obligation to grant such license to you, and may grant exclusive or non-exclusive
+licenses to others. You may contact the following by email to discuss commercial use:: vtippatents@vtip.org
+
+Limitation of Liability: IN NO EVENT WILL VIRGINIA TECH, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF VIRGINIA TECH OR OTHER PARTY HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+For full terms and conditions, please visit https://bitbucket.org/bemoss/bemoss_os.
+
+Address all correspondence regarding this license to Virginia Tech's electronic mail address:: vtippatents@vtip.org
+
+
+    -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap -->
+<link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="/static/css/thin-admin.css" rel="stylesheet" media="screen">
+<link href="/static/css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="/static/style/style.css" rel="stylesheet">
+<link href="/static/style/dashboard.css" rel="stylesheet">
+<!-- Notify CSS -->
+<link href="/static/css/bootstrap-notify/bootstrap-notify.css" rel="stylesheet">
+
+<!-- Custom Styles -->
+<link href="/static/css/bootstrap-notify/styles/alert-bangtidy.css" rel="stylesheet">
+<link href="/static/css/bootstrap-notify/styles/alert-blackgloss.css" rel="stylesheet">
+    <style>
+        .wrapper_register {
+            margin-left: 33%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+<body>
+<div class='notifications top-right'></div>
+          <div class='notifications bottom-right'></div>
+          <div class='notifications top-left'></div>
+          <div class='notifications bottom-left'></div>
+<div class="login-logo">
+	<img src="/static/images/logo.png" width="140" height="33">
+</div>
+<div class="wrapper wrapper_register ">
+  <div class="page-content">
+    <div class="content container">
+
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="widget">
+            <div class="widget-header"><div class="text-center"> <i class="icon-user"></i>
+              <h3>Sign Up!</h3></div>
+            </div>
+            <div class="widget-content" style="padding-bottom:0;">
+         <div class="body">
+
+                  <form class="form-horizontal label-left" method="post" id="user-form"
+                          data-validate="parsley">
+                    {% csrf_token %}
+                  <fieldset>
+                    <legend class="section">Personal Info</legend>
+                    <div class="control-group">
+                    <div class="col-md-3">
+                      <label for="first-name" class="control-label">First Name <span class="required">*</span></label>
+                      </div>
+                      <div class="col-md-9">
+                      <div class="form-group">
+                        <input type="text" class=" col-xs-9  parsley-validated" required name="first-name" id="first-name">
+                      </div>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                    <div class="col-md-3">
+                      <label for="last-name" class="control-label">Last Name <span class="required">*</span></label>
+                      </div>
+                      <div class="col-md-9">
+                      <div class="form-group">
+                        <input type="text" class="col-xs-9 parsley-validated" required name="last-name" id="last-name">
+                      </div>
+                      </div>
+                    </div>
+                   <!-- <div class="control-group">
+                    <div class="col-md-3">
+                      <label class="control-label">Gender</label>
+                      </div>
+                      <div class="col-md-9">
+                      <div class="form-group">
+                        <div data-toggle="buttons" class="btn-group" id="gender">
+                          <label data-toggle-passive-class="btn-default" data-toggle-class="btn-primary" class="btn btn-primary active">
+                            <input type="radio" value="male" name="gender">
+                            &nbsp; Male &nbsp; </label>
+                          <label data-toggle-passive-class="btn-default" data-toggle-class="btn-primary" class="btn btn-default">
+                            <input type="radio" value="female" name="gender">
+                            Female </label>
+                        </div>
+                        </div>
+                      </div>
+                    </div>-->
+                    <div class="control-group">
+                    <div class="col-md-3">
+                      <label for="last-name" class="control-label">Username <span class="required">*</span></label>
+                      </div>
+                      <div class="col-md-9">
+                      <div class="form-group">
+                        <input type="text" class="parsley-validated" required name="username" id="username" pattern="^(?=.*?[a-z])(?=.*?[0-9]).{8,15}$" title="Username should contain 8 to 15 characters, with minimum one lower case letter and one number">
+                          <!--<span class="help-block">Username should contain 8 to 15 characters, with minimum one lower case letter and one number</span>-->
+                      </div>
+                      </div>
+                    </div>
+                  <div class="control-group">
+                  <div class="col-md-3">
+                    <label class="control-label" for="password"> Password <span class="required">*</span> </label>
+                    </div>
+                    <div class="col-md-9">
+                    <div class="form-group">
+                      <input type="password" id="password" name="password" class="parsley-validated" required pattern="^.*(?=.{6,20})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&?]).*$" title="Password should contain 6 to 20 characters, minimum 1 upper case letter, minimum 1 lower case letter, and one of !#$%&?">
+                        <!--<span class="help-block"> Password should contain 6 to 20 characters, minimum 1 upper case letter, minimum 1 lower case letter, and one of !#$%&?</span>-->
+                    </div>
+                    </div>
+                      <div class="col-md-3">
+                          <label class="control-label" for="password"> Retype Password <span class="required">*</span></label>
+                      </div>
+                      <div class="col-md-9">
+                    <div class="form-group">
+                      <input type="password" id="password-r" name="password-r" class="parsley-validated" data-minlength="6" data-trigger="change"
+                                               data-equalto="#password" pattern="^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&?]).*$"
+                                               required="required" title="Repeat password here">
+                        <!--<span class="help-block"> Repeat password here </span>-->
+
+                    </div>
+                    </div>
+                  </div>
+                  </fieldset><br/>
+                  <fieldset>
+                    <legend class="section">Contact Info</legend>
+                    <div class="control-group">
+                    <div class="col-md-3">
+                      <label class="control-label" for="email" id="email-label">Email <span class="required">*</span></label>
+                      </div>
+                      <div class="col-md-9">
+                      <div class="form-group">
+                        <div class="col-xs-12 col-sm-8">
+                          <div class="input-group">
+                            <a href="#" data-toggle="tooltip" title="Enter a valid email">
+                                <input type="email" name="email" class="form-control parsley-validated" required data-trigger="change" id="email">
+                            </a>
+                            </div>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                    <div class="col-md-3">
+                      <label class="control-label" for="phone">Phone <span class="required">*</span></label>
+                      </div>
+                      <div class="col-md-9">
+                      <div class="form-group">
+                        <div class="col-xs-12 col-sm-8">
+                          <div class="input-group">
+                            <input type="text" pattern="^\D?(\d{3})\D?\D?(\d{3})\D?(\d{4})$" name="phone" required class="form-control mask parsley-validated" id="phone" title="Enter a valid 10-digit phone number (US)">
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                    </div>
+                  </fieldset>
+                  <div class="form-actions text-center">
+                    <button class="btn btn-primary" type="submit" id="register">Register</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="login-content">
+<div class="widget-content" style="padding-bottom:0;">
+<div class="text-center" id="reg_msg">{{ message }}</div>
+<br/>
+</div>
+</div>
+    {% endfor %}
+    {% endif %}
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="/static/js/jquery.js"></script> 
+<script src="/static/js/bootstrap.min.js"></script> 
+<script type="text/javascript" src="/static/js/smooth-sliding-menu.js"></script>
+<script class="include" type="text/javascript" src="/static/javascript/jquery.min.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/bootstrap-notify.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.min.js"></script>
+<script type="text/javascript" src="/static/app_js/register.js"></script>
+
+ 
+
+<!--switcher html start-->
+</body>
+</html>

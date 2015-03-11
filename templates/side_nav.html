@@ -1,0 +1,167 @@
+
+<!--
+
+# Authors: Kruthika Rathinavel
+# Version: 1.2.1
+# Email: kruthika@vt.edu
+# Created: "2014-10-13 18:45:40"
+# Updated: "2015-02-13 15:06:41"
+
+
+Copyright © 2014 by Virginia Polytechnic Institute and State University
+All rights reserved
+
+Virginia Polytechnic Institute and State University (Virginia Tech) owns the copyright for the BEMOSS software and its
+associated documentation ("Software") and retains rights to grant research rights under patents related to
+the BEMOSS software to other academic institutions or non-profit research institutions.
+You should carefully read the following terms and conditions before using this software.
+Your use of this Software indicates your acceptance of this license agreement and all terms and conditions.
+
+You are hereby licensed to use the Software for Non-Commercial Purpose only.  Non-Commercial Purpose means the
+use of the Software solely for research.  Non-Commercial Purpose excludes, without limitation, any use of
+the Software, as part of, or in any way in connection with a product or service which is sold, offered for sale,
+licensed, leased, loaned, or rented.  Permission to use, copy, modify, and distribute this compilation
+for Non-Commercial Purpose to other academic institutions or non-profit research institutions is hereby granted
+without fee, subject to the following terms of this license.
+
+Commercial Use: If you desire to use the software for profit-making or commercial purposes,
+you agree to negotiate in good faith a license with Virginia Tech prior to such profit-making or commercial use.
+Virginia Tech shall have no obligation to grant such license to you, and may grant exclusive or non-exclusive
+licenses to others. You may contact the following by email to discuss commercial use:: vtippatents@vtip.org
+
+Limitation of Liability: IN NO EVENT WILL VIRGINIA TECH, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF VIRGINIA TECH OR OTHER PARTY HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+For full terms and conditions, please visit https://bitbucket.org/bemoss/bemoss_os.
+
+Address all correspondence regarding this license to Virginia Tech's electronic mail address:: vtippatents@vtip.org
+
+
+    -->
+{% load dashboard_extras %}
+{% load switch_case %}
+{% load timedelta %}
+{% load device_count_in_zone %}
+<div class="left-nav">
+    <div id="side-nav">
+      <ul id="nav">
+      	<!-- <li class="current"> <a href="index.html"> <i class="icon-home"></i> Home </a> </li> -->
+        <li > <a href="/home"> <i class="icon-home"></i> Home </a> </li>
+      {% ifequal request.user.get_profile.group.name|lower 'admin' %}
+        <!--<li class="current"> <a href="#"> <i class="icon-dashboard"></i>  Discover/ Manage <span class="label label-warning pull-right">{{ 999|device_count }}</span> </a> </li>-->
+         <li>
+          <a href="#"> <i class="icon-globe"></i> Discover/Manage <span class="label label-warning pull-right" style="font-size: 14px;color:black;">{{ 999|dev_emsys_ct_all }}</span> <i class="arrow icon-angle-left"></i></a>
+          <ul class="sub-menu">
+            <li> <a href="/ndiscover"> <i class="icon-angle-right"></i> Nodes <span class="label label-warning pull-right" style="color:black;font-size: 14px;">{{ 999|embsys_count }}</span></a> </li>
+            <li> <a href="/discover"> <i class="icon-angle-right"></i> Devices <span class="label label-warning pull-right" style="color:black;font-size: 14px;">{{ "all"|all_dev_ct }}</span></a> </li>
+          </ul>
+        </li>
+         <li>
+          <a href="#"> <i class="icon-signal"></i> Network Status <i class="arrow icon-angle-left"></i></a>
+          <ul class="sub-menu">
+            <li> <a href="/nwstat"> <i class="icon-angle-right"></i> Node Status </a> </li>
+            <li> <a href="/dstat"> <i class="icon-angle-right"></i> Device Status</a> </li>
+          </ul>
+        </li>
+          <!--<li> <a href="/nwstat"> <i class="icon-bolt"></i> Network Status </a> </li>
+        <li> <a href="/dstat"> <i class="icon-cog"></i> Device Status </a> </li>
+         <li> <a href="/alerts"> <i class="icon-bell"></i> Alarm Settings</a></li>
+          <li> <a href="/ntfns"> <i class="icon-comment"></i> All Notifications</a></li>-->
+      <li> <a href="/usr_mngr"> <i class="icon-user"></i> Manage Users <span class="label label-success pull-right" style="font-size: 14px;color:black;">{{ zones|new_users }}</span></a></li>
+       <li> <a href="/bemoss_settings"> <i class="icon-key"></i>Misc Settings</a></li>
+
+      {% endifequal %}
+          {% for zone in zones %}
+              <li> <a href="#"> <i class="icon-desktop"></i> {{zone.zone_nickname}} <span class="label label-success pull-right" style="font-size: 14px;color:black;">{{ zone.id|device_count }}</span><i class="arrow icon-angle-left"></i></a>
+
+       {% ifnotequal zone.id|device_count 0 %}
+
+         <ul class="sub-menu">
+         {% if zone.id|device_count > 0%}
+             <li class="current"> <a href="/all_devices/{{ zone.id }}"> <i class="icon-table"></i> View All Devices </a></li>
+             {% endif %}
+             <!--<li> <a href="/floor/{{zone.zone_nickname}}" id="{{zone.zone_nickname}}-globalcontrol"> <i class="icon-cloud"></i> {{zone.zone_nickname}} Control </a></li>-->
+             <li> <a href="#"> <i class="icon-inbox"></i> HVAC Controllers <span class="label label-primary pull-right" style="font-size: 14px;color:black;">{{ zone.id|hvac_count }}</span><i class="arrow icon-angle-left navbar-collapse"></i></a>
+             <ul class="submenu">
+             {% if zone.id|hvac_count > 0%}
+             <li class="current"> <a href="/devices/{{ zone.id }}_th"> <i class="icon-table"></i> View All </a></li>
+             {% endif %}
+            {% for device in thermostat_sn %}
+			{% ifequal zone.id device.zone_id %}
+                <li> <a href="#"> <i class="icon-inbox"></i> {{ device.nickname }} <i class="arrow icon-angle-left"></i></a>
+                <ul class="sub-menu">
+                    <li> <a href="/tstat/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-cogs"></i> Monitor and Control </a></li>
+                    {% if request.user.get_profile.group.name|lower == 'admin' or request.user.get_profile.zone.zone_id ==  device.zone_id  %}
+                    <li> <a href="/th_schedule/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="icon-time"></i> Schedule </a></li>
+                    {% endif %}
+                    <li> <a href="/th_statistics/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-bar-chart-o"></i> Past Usage Statistics </a></li>
+                </ul>
+                </li>
+            {% endifequal %}
+            {% endfor %}
+             </ul>
+            </li>
+            <li> <a href="#"> <i class="fa fa-lightbulb-o"></i> Lighting Controllers <span class="label label-primary pull-right" style="font-size: 14px;color:black;">{{ zone.id|lt_count }}</span> <i class="arrow icon-angle-left"></i></a>
+            <ul class="submenu">
+            {% if zone.id|lt_count > 0%}
+             <li class="current"> <a href="/devices/{{ zone.id }}_lt"> <i class="icon-table"></i> View All </a></li>
+            {% endif %}
+            {% for device in lighting_sn %}
+			{% ifequal zone.id device.zone_id %}
+                <li> <a href="#"> <i class="fa fa-lightbulb-o"></i> {{ device.nickname }} <i class="arrow icon-angle-left"></i></a>
+                <ul class="sub-menu">
+                    <li> <a href="/light/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-cogs"></i> Monitor and Control </a></li>
+                    {% ifequal device_type_id '2WL' %}
+                        {% if request.user.get_profile.group.name|lower == 'admin' or request.user.get_profile.zone.zone_id ==  device.zone_id  %}
+                     <li> <a href="/pl_schedule/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="icon-time"></i> Schedule </a></li>
+                     {% endif %}
+                        <li> <a href="/pl_statistics/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-bar-chart-o"></i> Past Usage Statistics </a></li>
+                    {% else %}
+                     {% if request.user.get_profile.group.name|lower == 'admin' or request.user.get_profile.zone.zone_id ==  device.zone_id  %}
+                        <li> <a href="/lt_schedule/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="icon-cloud"></i> Schedule </a></li>
+                     {% endif %}
+                        <li> <a href="/lt_statistics/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-bar-chart-o"></i> Past Usage Statistics </a></li>
+                    {% endifequal %}
+                </ul>
+                </li>
+            {% endifequal %}
+            {% endfor %}
+             </ul>
+            </li>
+          <li> <a href="#"> <i class="fa fa-power-off"></i> Plug Load Controllers <span class="label label-primary pull-right" style="font-size: 14px;color:black;">{{ zone.id|pl_count }}</span><i class="arrow icon-angle-left"></i></a>
+            <ul class="submenu">
+            {% if zone.id|pl_count > 0%}
+             <li class="current"> <a href="/devices/{{ zone.id }}_pl"> <i class="icon-table"></i> View All </a></li>
+            {% endif %}
+            {% for device in plugload_sn %}
+			{% ifequal zone.id device.zone_id %}
+                <li> <a href="#"> <i class="fa fa-power-off"></i> {{ device.nickname }} <i class="arrow icon-angle-left"></i></a>
+                <ul class="sub-menu">
+                    <li> <a href="/plug/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-cogs"></i> Monitor and Control </a></li>
+                    {% if request.user.get_profile.group.name|lower == 'admin' or request.user.get_profile.zone.zone_id ==  device.zone_id  %}
+                    <li> <a href="/pl_schedule/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="icon-time"></i> Schedule </a></li>
+                    {% endif %}
+                    {% ifequal device_type_id '3WP' %}
+                     <li> <a href="/wtpl_statistics/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-bar-chart-o"></i> Past Usage Statistics </a></li>
+                    {% else %}
+                     <li> <a href="/pl_statistics/{{device.mac_address}}" id="{{ device.device_id }}-home"> <i class="fa fa-bar-chart-o"></i> Past Usage Statistics </a></li>
+                    {% endifequal %}
+                </ul>
+                </li>
+            {% endifequal %}
+            {% endfor %}
+             </ul>
+            </li>
+
+        </ul>
+    {% endifnotequal %}
+              </li>
+      {% endfor %}
+       <li> <a href="/logout"> <i class="icon-power-off"></i> Log Out</a></li>
+      </ul>
+    </div>
+  </div>

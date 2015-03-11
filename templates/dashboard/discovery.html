@@ -1,0 +1,661 @@
+{% load dashboard_extras %}
+{% load switch_case %}
+{% load timedelta %}
+{% load device_count_in_zone %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>Device Discovery</title>
+<!--
+
+# Authors: Kruthika Rathinavel
+# Version: 1.2.1
+# Email: kruthika@vt.edu
+# Created: "2014-10-13 18:45:40"
+# Updated: "2015-02-13 15:06:41"
+
+
+Copyright © 2014 by Virginia Polytechnic Institute and State University
+All rights reserved
+
+Virginia Polytechnic Institute and State University (Virginia Tech) owns the copyright for the BEMOSS software and its
+associated documentation ("Software") and retains rights to grant research rights under patents related to
+the BEMOSS software to other academic institutions or non-profit research institutions.
+You should carefully read the following terms and conditions before using this software.
+Your use of this Software indicates your acceptance of this license agreement and all terms and conditions.
+
+You are hereby licensed to use the Software for Non-Commercial Purpose only.  Non-Commercial Purpose means the
+use of the Software solely for research.  Non-Commercial Purpose excludes, without limitation, any use of
+the Software, as part of, or in any way in connection with a product or service which is sold, offered for sale,
+licensed, leased, loaned, or rented.  Permission to use, copy, modify, and distribute this compilation
+for Non-Commercial Purpose to other academic institutions or non-profit research institutions is hereby granted
+without fee, subject to the following terms of this license.
+
+Commercial Use: If you desire to use the software for profit-making or commercial purposes,
+you agree to negotiate in good faith a license with Virginia Tech prior to such profit-making or commercial use.
+Virginia Tech shall have no obligation to grant such license to you, and may grant exclusive or non-exclusive
+licenses to others. You may contact the following by email to discuss commercial use:: vtippatents@vtip.org
+
+Limitation of Liability: IN NO EVENT WILL VIRGINIA TECH, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF VIRGINIA TECH OR OTHER PARTY HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+For full terms and conditions, please visit https://bitbucket.org/bemoss/bemoss_os.
+
+Address all correspondence regarding this license to Virginia Tech's electronic mail address:: vtippatents@vtip.org
+
+
+    -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap -->
+<link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="/static/css/thin-admin.css" rel="stylesheet" media="screen">
+<link href="/static/css/font-awesome.css" rel="stylesheet" media="screen">
+<link media="screen" rel="stylesheet" href="/static/font-awesome-4.0.3/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="/static/css/fam-icons/fam-icons.css">
+<link href="/static/style/style.css" rel="stylesheet">
+<link href="/static/css/alerts.css" rel="stylesheet">
+<link href="/static/css/demo_page.css" rel="stylesheet">
+<link href="/static/css/demo_table.css" rel="stylesheet">
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+
+<!-- Notify CSS -->
+<link href="/static/css/bootstrap-notify/bootstrap-notify.css" rel="stylesheet">
+
+<!-- Custom Styles -->
+<link href="/static/css/bootstrap-notify/styles/alert-bangtidy.css" rel="stylesheet">
+<link href="/static/css/bootstrap-notify/styles/alert-blackgloss.css" rel="stylesheet">
+
+<script class="include" type="text/javascript" src="/static/javascript/jquery.min.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.min.js"></script>
+
+<!--[if IE]><script type="text/javascript" src="/static/assets/jqueryknobdial/excanvas.js"></script><![endif]-->
+
+</head>
+<body>
+{% include 'top_nav.html' %}
+<div class="wrapper">
+{% include 'side_nav.html' %}
+  <div class="page-content" id="dashboard_content">
+    <form action="" method="post">
+  	{% csrf_token %}
+    <div class="content container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h2 class="page-title">Discovered Devices</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="widget">
+            <div class="widget-header"> <i class="icon-arrow-right"></i>
+              <h3>New Devices Discovered</h3>
+            </div>
+            <div class="widget-content">
+              <div class="tabbable tabs-left">
+                <ul class="nav nav-tabs" id="myTabLeft">
+
+                  <!--<li class="active"><a data-toggle="tab" href="#lite">BEMOSS Lite</a></li>-->
+                     <li class="active"><a data-toggle="tab" href="#thermostats">HVAC Controllers&nbsp;<span class="label label-warning pull-right" style="color:black;">{{ "hvac"|d_ct }}</span></a></li>
+                  <li class=""><a data-toggle="tab" href="#lightingloads">Lighting Load Controllers&nbsp;<span class="label label-warning pull-right" style="color:black;">{{ "light"|d_ct }}</span></a></li>
+                  <li class=""><a data-toggle="tab" href="#plugloads">Plugload Controllers&nbsp;<span class="label label-warning pull-right" style="color:black;">{{ "plug"|d_ct }}</span></a></li>
+                </ul>
+                <div class="tab-content" id="myTabContentLeft">
+
+                  <div id="thermostats" class="tab-pane fade active in">
+                      <div class="widget-content">
+        <div class="example_alt_pagination">
+              <div id="container">
+                <div class="full_width big"></div>
+          <div id="demo">
+            <table class="display example" id="thermostats_tbl">
+      <thead>
+        <tr>
+          <th class="col-md-1">Nickname</th>
+          <th class="col-md-2">Vendor</th>
+          <th class="col-md-1">Model</th>
+          <th class="col-md-2">MAC Address</th>
+          <th class="col-md-2">Date Added</th>
+          <th class="col-md-1">Identify Device</th>
+          <th class="col-md-2">Zone</th>
+          <th class="col-md-1">Non-BEMOSS Device?</th>
+        </tr>
+        </thead>
+      <tbody>
+
+      {% for thermostat in thermostats %}
+          {% if thermostat.network_status == 'Online' and thermostat.zone_id == 999 %}
+        <tr {% if thermostat.device_model_id.device_model_id == '1TH' or thermostat.device_model_id.device_model_id == '1NST'  %}
+                class="gradeA"
+            {% endif %}
+            >
+          <td><input type="text" placeholder="{{ thermostat.nickname }}" id="nick-{{ thermostat.device_id }}" class="form-control" value="{{ thermostat.nickname }}"></td>
+          <td>{{ thermostat.vendor_name }}</td>
+          <td>{{ thermostat.device_model }}</td>
+          <td>{{ thermostat.mac_address }}</td>
+            <td>{{ thermostat.date_added }}</td>
+             <td>{% if thermostat.identifiable  %}
+                 <button class="btn btn-warning btn-xs identify"
+                         id="identify-{{ thermostat.device_id }}"><i class="icon-search" id="{{ thermostat.device_id }}-spin"></i>
+                 Identify Device</button>{% endif %}</td>
+            <td> <div class="panel panel-back" >
+                       <div class="btn-group btn-input clearfix" style="margin-bottom: -10px; margin-top: 2px;">
+                         <button type="button" id="drop_zone-{{ thermostat.device_id }}-{{ thermostat.device_model_id.device_model_id }}" class="btn btn-xs btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                           <span data-bind="label" id="zone-{{ thermostat.device_id }}-{{ thermostat.device_model_id.device_model_id }}">{{ thermostat.zone_nickname }}</span>&nbsp;<span class="caret"></span>
+                         </button>
+                         <ul class="dropdown-menu" role="menu">
+                           {% for zone in zones %}
+                                <li><a href="#" id="{{ zone.id }}">{{ zone.zone_nickname }}</a></li>
+                            {% endfor %}
+                         </ul>
+                     </div>
+                  </div></td>
+            <td><input type="checkbox" value="" id="nbd-{{ thermostat.device_id }}" name="nbd_{{ thermostat.device_id }}" class="parsley-validated"></td>
+        </tr>
+          {% endif %}
+      {%  endfor  %}
+        </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+  </table>
+
+    </div>
+        </div>
+    </div>
+
+            </div><br/>
+                    <div class="col-lg-12">
+                  <div class="text-center">
+                    <button class="btn btn-primary" id="submit_thermostats" type="submit">Save Changes to HVAC Controllers</button>
+                    <button class="btn btn-default" type="button">Cancel</button>
+                  </div>
+                </div>
+                    </div>
+                  <div id="lightingloads" class="tab-pane fade">
+<div class="widget-content">
+<div class="example_alt_pagination">
+      <div id="container1">
+        <div class="full_width big"></div>
+  <div id="demo">
+    <table cellpadding="0" cellspacing="0" border="0" class="display example" id="lighting_tbl">
+      <thead>
+        <tr>
+          <th class="col-md-1">Nickname</th>
+          <th class="col-md-2">Vendor</th>
+          <th class="col-md-1">Model</th>
+          <th class="col-md-2">MAC Address</th>
+          <th class="col-md-2">Date Added</th>
+          <th class="col-md-1">Identify Device</th>
+          <th class="col-md-2">Zone</th>
+          <th class="col-md-1">Non-BEMOSS Device?</th>
+        </tr>
+        </thead>
+      <tbody>
+      {% for lighting in lighting_loads %}
+          {% if lighting.network_status == 'Online' and lighting.zone_id == 999 %}
+        <tr {% if lighting.device_model_id.device_model_id == '2HUE' or lighting.device_model_id.device_model_id == '2DB' or lighting.device_model_id.device_model_id == '2SDB' or lighting.device_model_id.device_model_id == '2WSL' or lighting.device_model_id.device_model_id == '2WL' %}
+                class="gradeA"
+            {% endif %}
+            >
+          <td><input type="text" placeholder="{{ lighting.nickname }}" id="nick-{{ lighting.device_id }}" class="form-control" value="{{ lighting.nickname }}"></td>
+          <td>{{ lighting.vendor_name }}</td>
+          <td>{{ lighting.device_model }}</td>
+          <td>{{ lighting.mac_address }}</td>
+            <td>{{ lighting.date_added }}</td>
+             <td>{% if lighting.identifiable  %} <button class="btn btn-warning btn-xs identify"
+                         id="identify-{{ lighting.device_id }}"><i class="icon-search" id="{{ lighting.device_id }}-spin"></i>
+                 Identify Device</button>{% endif %}</td>
+            <td> <div class="panel panel-back" >
+                       <div class="btn-group btn-input clearfix" style="margin-bottom: -10px; margin-top: 2px;">
+                         <button type="button" id="drop_zone-{{ lighting.device_id }}" class="btn btn-xs btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                           <span data-bind="label" id="zone-{{ lighting.device_id }}">{{ lighting.zone_nickname }}</span>&nbsp;<span class="caret"></span>
+                         </button>
+                         <ul class="dropdown-menu" role="menu">
+                            {% for zone in zones %}
+                                <li><a href="#" id="{{ zone.id }}">{{ zone.zone_nickname }}</a></li>
+                            {% endfor %}
+                         </ul>
+                     </div>
+                  </div></td>
+        <td><input type="checkbox" value=""  id="nbd-{{ lighting.device_id }}" name="nbd_{{ lighting.device_id }}" class="parsley-validated"></td>
+        </tr>
+          {% endif %}
+      {%  endfor  %}
+        </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+  </table>
+
+    </div>
+        </div>
+    </div>
+
+            </div><br/>
+                    <div class="col-lg-12">
+                  <div class="text-center">
+                    <button class="btn btn-primary" id="submit_lighting" type="submit">Save Changes to Lighting Load Controllers</button>
+                    <button class="btn btn-default" type="button">Cancel</button>
+                  </div>
+                </div>
+                  </div>
+                  <div id="plugloads" class="tab-pane fade">
+                    <div class="widget-content">
+<div class="example_alt_pagination">
+      <div id="container">
+        <div class="full_width big"></div>
+  <div id="demo">
+    <table cellpadding="0" cellspacing="0" border="0" class="display example" id="plugload_tbl">
+      <thead>
+        <tr>
+          <th class="col-md-1">Nickname</th>
+          <th class="col-md-2">Vendor</th>
+          <th class="col-md-1">Model</th>
+          <th class="col-md-2">MAC Address</th>
+          <th class="col-md-2">Date Added</th>
+          <th class="col-md-1">Identify Device</th>
+          <th class="col-md-2">Zone</th>
+          <th class="col-md-1">Non-BEMOSS Device?</th>
+        </tr>
+        </thead>
+      <tbody>
+
+      {% for plugload in plugloads %}
+          {% if plugload.network_status == 'Online' and plugload.zone_id == 999 %}
+        <tr {% if plugload.device_model_id.device_model_id == '3WSP' or plugload.device_model_id.device_model_id == '3WP' or plugload.device_model_id.device_model_id == '3VTH' or plugload.device_model_id.device_model_id == '3DSP' %}
+                class="gradeA"
+            {% endif %}
+            >
+          <td><input type="text" placeholder="{{ plugload.nickname }}" id="nick-{{ plugload.device_id }}" class="form-control" value="{{ plugload.nickname }}"></td>
+          <td>{{ plugload.vendor_name }}</td>
+          <td>{{ plugload.device_model }}</td>
+          <td>{{ plugload.mac_address }}</td>
+            <td>{{ plugload.date_added }}</td>
+             <td>{% if plugload.identifiable  %} <button class="btn btn-warning btn-xs identify"
+                         id="identify-{{ plugload.device_id }}"><i class="icon-search" id="{{ plugload.device_id }}-spin"></i>
+                 Identify Device</button>{% endif %}</td>
+            <td> <div class="panel panel-back">
+                       <div class="btn-group btn-input clearfix" style="margin-bottom: -10px; margin-top: 2px;">
+                         <button type="button" id="drop_zone-{{ plugload.device_id }}" class="btn btn-xs btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                           <span data-bind="label" id="zone-{{ plugload.device_id }}">{{ plugload.zone_nickname }}</span>&nbsp;<span class="caret"></span>
+                         </button>
+                         <ul class="dropdown-menu" role="menu">
+                            {% for zone in zones %}
+                                <li><a href="#" id="{{ zone.id }}">{{ zone.zone_nickname }}</a></li>
+                            {% endfor %}
+                         </ul>
+                     </div>
+                  </div></td>
+        <td><input type="checkbox" value=""  id="nbd-{{ plugload.device_id }}" name="nbd_{{ plugload.device_id }}" class="parsley-validated"></td>
+        </tr>
+          {% endif %}
+      {%  endfor  %}
+        </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+  </table>
+
+    </div>
+        </div>
+    </div>
+
+            </div><br/>
+                    <div class="col-lg-12">
+                  <div class="text-center">
+                    <button class="btn btn-primary" id="submit_plugloads" type="submit">Save Changes to Plugload Controllers</button>
+                    <button class="btn btn-default" type="button">Cancel</button>
+                  </div>
+                </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+          <div class="widget">
+            <div class="widget-header"> <i class="icon-arrow-right"></i>
+              <h3>Manage BEMOSS Devices</h3>
+            </div>
+            <div class="widget-content">
+              <div class="tabbable tabs-left">
+                <ul class="nav nav-tabs" id="myTabLeft">
+
+                  <!--<li class="active"><a data-toggle="tab" href="#lite">BEMOSS Lite</a></li>-->
+                     <li class="active"><a data-toggle="tab" href="#thermostats_m">HVAC Controllers &nbsp;<span class="label label-primary pull-right">{{ "hvac"|md_ct }}</span></a></li>
+                  <li class=""><a data-toggle="tab" href="#lightingloads_m">Lighting Load Controllers&nbsp;<span class="label label-primary pull-right" >{{ "light"|md_ct }}</span></a></li>
+                  <li class=""><a data-toggle="tab" href="#plugloads_m">Plugload Controllers&nbsp;<span class="label label-primary pull-right" >{{ "plug"|md_ct }}</span></a></li>
+                </ul>
+                <div class="tab-content" id="myTabContentLeft">
+                  <div id="thermostats_m" class="tab-pane active in">
+                      <div class="widget-content">
+        <div class="example_alt_pagination">
+              <div id="container">
+                <div class="full_width big"></div>
+          <div id="demo">
+            <table class="display example" id="thermostats_tblm">
+      <thead>
+        <tr>
+            <th></th>
+          <th class="col-md-1">Nickname</th>
+          <th class="col-md-2">Vendor</th>
+          <th class="col-md-1">Model</th>
+          <th class="col-md-2">MAC Address</th>
+          <th class="col-md-2">Date Added</th>
+          <th class="col-md-1">Identify Device</th>
+          <th class="col-md-2">Zone</th>
+        </tr>
+        </thead>
+      <tbody>
+
+      {% for thermostat in thermostats %}
+          {% ifequal thermostat.network_status|capfirst 'Online' %}
+        <tr {% if thermostat.device_model_id.device_model_id == '1TH' or thermostat.device_model_id.device_model_id == '1NST'  %}
+                class="gradeA"
+            {% endif %}
+            >
+        <td class="text-center"><input type="checkbox" value=""  id="modify_{{ thermostat.device_id }}" name="modify_device"></td>
+          <td><input type="text" placeholder="{{ thermostat.nickname }}" id="mnick-{{ thermostat.device_id }}" class="form-control" value="{{ thermostat.nickname }}"></td>
+          <td>{{ thermostat.vendor_name }}</td>
+          <td>{{ thermostat.device_model }}</td>
+          <td>{{ thermostat.mac_address }}</td>
+            <td>{{ thermostat.date_added }}</td>
+             <td>{% if thermostat.identifiable %}<button class="btn btn-warning btn-xs identify"
+                         id="midentify-{{ thermostat.device_id }}"><i class="icon-search" id="{{ thermostat.device_id }}-spin"></i>
+                 Identify Device</button>{% endif %}</td>
+            <td> <div class="panel panel-back" >
+                       <div class="btn-group btn-input clearfix" style="margin-bottom: -10px; margin-top: 2px;">
+                         <button type="button" id="mdrop_zone-{{ thermostat.device_id }}-{{ thermostat.device_model_id.device_model_id }}" class="btn btn-xs btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                           <span data-bind="label" id="mzone-{{ thermostat.device_id }}-{{ thermostat.device_model_id.device_model_id }}">{{ thermostat.zone_nickname }}</span>&nbsp;<span class="caret"></span>
+                         </button>
+                         <ul class="dropdown-menu" role="menu">
+                            {% for zone in zones %}
+                                <li><a href="#" id="{{ zone.id }}">{{ zone.zone_nickname }}</a></li>
+                            {% endfor %}
+                         </ul>
+                     </div>
+                  </div></td>
+            </tr>
+          {% endifequal %}
+      {%  endfor  %}
+
+        </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+  </table>
+
+    </div>
+        </div>
+    </div>
+
+            </div><br/>
+                  <div class="col-lg-12">
+                      <div class="text-center">
+                          Please select devices to be modified using the checkbox on the left, and then click Modify button to save.
+                      </div>
+                  </div> <br/>
+                    <div class="col-lg-12">
+                  <div class="text-center">
+                    <button class="btn btn-primary" id="modify_thermostats" type="submit">Modify Selected HVAC Controllers</button>
+                    <button class="btn btn-default" type="button">Cancel</button>
+                  </div>
+                </div>
+                    </div>
+                  <div id="lightingloads_m" class="tab-pane fade">
+<div class="widget-content">
+<div class="example_alt_pagination">
+      <div id="container1">
+        <div class="full_width big"></div>
+  <div id="demo">
+    <table cellpadding="0" cellspacing="0" border="0" class="display example" id="lighting_tblm">
+      <thead>
+        <tr>
+            <th class="col-md-1"></th>
+          <th class="col-md-1">Nickname</th>
+          <th class="col-md-2">Vendor</th>
+          <th class="col-md-1">Model</th>
+          <th class="col-md-2">MAC Address</th>
+          <th class="col-md-2">Date Added</th>
+          <th class="col-md-1">Identify Device</th>
+          <th class="col-md-2">Zone</th>
+        </tr>
+        </thead>
+      <tbody>
+      {% for lighting in lighting_loads %}
+          {% ifequal lighting.network_status|capfirst 'Online' %}
+        <tr {% if lighting.device_model_id.device_model_id == '2HUE' or lighting.device_model_id.device_model_id == '2DB' or lighting.device_model_id.device_model_id == '2SDB' or lighting.device_model_id.device_model_id == '2WSL' or lighting.device_model_id.device_model_id == '2WL' %}
+                class="gradeA"
+            {% endif %}
+            >
+        <td class="text-center"><input type="checkbox" value=""  id="modify_{{ lighting.device_id }}" name="modify_device"></td>
+          <td><input type="text" placeholder="{{ lighting.nickname }}" id="mnick-{{ lighting.device_id }}" class="form-control" value="{{ lighting.nickname }}"></td>
+          <td>{{ lighting.vendor_name }}</td>
+          <td>{{ lighting.device_model }}</td>
+          <td>{{ lighting.mac_address }}</td>
+            <td>{{ lighting.date_added }}</td>
+             <td>{% if lighting.identifiable %}<button class="btn btn-warning btn-xs identify"
+                         id="midentify-{{ lighting.device_id }}"><i class="icon-search" id="{{ lighting.device_id }}-spin"></i>
+                 Identify Device</button>{% endif %}</td>
+            <td> <div class="panel panel-back" >
+                       <div class="btn-group btn-input clearfix" style="margin-bottom: -10px; margin-top: 2px;">
+                         <button type="button" id="mdrop_zone-{{ lighting.device_id }}" class="btn btn-xs btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                           <span data-bind="label" id="mzone-{{ lighting.device_id }}">{{ lighting.zone_nickname }}</span>&nbsp;<span class="caret"></span>
+                         </button>
+                         <ul class="dropdown-menu" role="menu">
+                            {% for zone in zones %}
+                                <li><a href="#" id="{{ zone.id }}">{{ zone.zone_nickname }}</a></li>
+                            {% endfor %}
+                         </ul>
+                     </div>
+                  </div></td>
+         </tr>
+          {% endifequal %}
+      {%  endfor  %}
+        </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+            <th></th>
+          <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+  </table>
+
+    </div>
+        </div>
+    </div>
+
+            </div><br/><div class="col-lg-12">
+                      <div class="text-center">
+                          Please select devices to be modified using the checkbox on the left, and then click Modify button to save.
+                      </div>
+                  </div> <br/>
+                    <div class="col-lg-12">
+                  <div class="text-center">
+                    <button class="btn btn-primary" id="modify_lightingloads" type="submit">Modify Selected Lighting Load Controllers</button>
+                    <button class="btn btn-default" type="button">Cancel</button>
+                  </div>
+                </div>
+                  </div>
+                  <div id="plugloads_m" class="tab-pane fade">
+                    <div class="widget-content">
+<div class="example_alt_pagination">
+      <div id="container">
+        <div class="full_width big"></div>
+  <div id="demo">
+    <table cellpadding="0" cellspacing="0" border="0" class="display example" id="plugload_tblm">
+      <thead>
+        <tr>
+          <th class="col-md-1"></th>
+          <th class="col-md-1">Nickname</th>
+          <th class="col-md-2">Vendor</th>
+          <th class="col-md-1">Model</th>
+          <th class="col-md-2">MAC Address</th>
+          <th class="col-md-2">Date Added</th>
+          <th class="col-md-1">Identify Device</th>
+          <th class="col-md-2">Zone</th>
+        </tr>
+        </thead>
+      <tbody>
+
+      {% for plugload in plugloads %}
+          {% ifequal plugload.network_status 'Online' %}
+        <tr {% if plugload.device_model_id.device_model_id == '3WSP' or plugload.device_model_id.device_model_id == '3WP' or plugload.device_model_id.device_model_id == '3VTH' or plugload.device_model_id.device_model_id == '3DSP' %}
+                class="gradeA"
+            {% endif %}
+            >
+        <td class="text-center"><input type="checkbox" value=""  id="modify_{{ plugload.device_id }}" name="modify_device"></td>
+          <td><input type="text" placeholder="{{ plugload.nickname }}" id="mnick-{{ plugload.device_id }}" class="form-control" value="{{ plugload.nickname }}"></td>
+          <td>{{ plugload.vendor_name }}</td>
+          <td>{{ plugload.device_model }}</td>
+          <td>{{ plugload.mac_address }}</td>
+            <td>{{ plugload.date_added }}</td>
+             <td>{% if plugload.identifiable %}<button class="btn btn-warning btn-xs identify"
+                         id="midentify-{{ plugload.device_id }}"><i class="icon-search" id="{{ plugload.device_id }}-spin"></i>
+                 Identify Device</button>{% endif %}</td>
+            <td> <div class="panel panel-back">
+                       <div class="btn-group btn-input clearfix" style="margin-bottom: -10px; margin-top: 2px;">
+                         <button type="button" id="mdrop_zone-{{ plugload.device_id }}" class="btn btn-xs btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                           <span data-bind="label" id="mzone-{{ plugload.device_id }}">{{ plugload.zone_nickname }}</span>&nbsp;<span class="caret"></span>
+                         </button>
+                         <ul class="dropdown-menu" role="menu">
+                            {% for zone in zones %}
+                                <li><a href="#" id="{{ zone.id }}">{{ zone.zone_nickname }}</a></li>
+                            {% endfor %}
+                         </ul>
+                     </div>
+                  </div></td>
+        </tr>
+          {% endifequal %}
+      {%  endfor  %}
+        </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+            <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+  </table>
+
+    </div>
+        </div>
+    </div>
+
+            </div><br/><div class="col-lg-12">
+                      <div class="text-center">
+                          Please select devices to be modified using the checkbox on the left, and then click Modify button to save.
+                      </div>
+                  </div> <br/>
+                    <div class="col-lg-12">
+                  <div class="text-center">
+                    <button class="btn btn-primary" id="modify_plugloads" type="submit">Modify Selected Plugload Controllers</button>
+                    <button class="btn btn-default" type="button">Cancel</button>
+                  </div>
+                </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="bottom-nav footer"> 2013-2015 &copy;: Building Energy Management Open Source Software. </div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/js/left_nav_slider.js"></script>
+           <script type="text/javascript" language="javascript" src="/static/js/jquery.js"></script>
+          <script type="text/javascript" language="javascript" src="/static/js/jquery.dataTables.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			$(document).ready(function() {
+				$('.example').dataTable( {
+					"sPaginationType": "full_numbers"
+				} );
+
+
+                var pathh = window.location.pathname;
+                pathh = pathh.slice(0, -1);
+                $('li a[href*="' + pathh + '"]').parent().parent().parent().addClass("current");
+			} );
+		</script>
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.min.js"></script>
+          <script class="include" type="text/javascript" src="/static/app_js/bootstrap-notify.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/discovery.js"></script>
+
+
+<!--switcher html start-->
+{% include 'theme_changer.html' %}
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+{% load dashboard_extras %}
+{% load switch_case %}
+{% load device_count_in_zone %}
+{% load timedelta %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>BEMOSS - Thermostat</title>
+<!--
+
+# Authors: Kruthika Rathinavel
+# Version: 1.2.1
+# Email: kruthika@vt.edu
+# Created: "2014-10-13 18:45:40"
+# Updated: "2015-02-13 15:06:41"
+
+
+Copyright © 2014 by Virginia Polytechnic Institute and State University
+All rights reserved
+
+Virginia Polytechnic Institute and State University (Virginia Tech) owns the copyright for the BEMOSS software and its
+associated documentation ("Software") and retains rights to grant research rights under patents related to
+the BEMOSS software to other academic institutions or non-profit research institutions.
+You should carefully read the following terms and conditions before using this software.
+Your use of this Software indicates your acceptance of this license agreement and all terms and conditions.
+
+You are hereby licensed to use the Software for Non-Commercial Purpose only.  Non-Commercial Purpose means the
+use of the Software solely for research.  Non-Commercial Purpose excludes, without limitation, any use of
+the Software, as part of, or in any way in connection with a product or service which is sold, offered for sale,
+licensed, leased, loaned, or rented.  Permission to use, copy, modify, and distribute this compilation
+for Non-Commercial Purpose to other academic institutions or non-profit research institutions is hereby granted
+without fee, subject to the following terms of this license.
+
+Commercial Use: If you desire to use the software for profit-making or commercial purposes,
+you agree to negotiate in good faith a license with Virginia Tech prior to such profit-making or commercial use.
+Virginia Tech shall have no obligation to grant such license to you, and may grant exclusive or non-exclusive
+licenses to others. You may contact the following by email to discuss commercial use:: vtippatents@vtip.org
+
+Limitation of Liability: IN NO EVENT WILL VIRGINIA TECH, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF VIRGINIA TECH OR OTHER PARTY HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+For full terms and conditions, please visit https://bitbucket.org/bemoss/bemoss_os.
+
+Address all correspondence regarding this license to Virginia Tech's electronic mail address:: vtippatents@vtip.org
+
+
+    -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap -->
+<link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="/static/css/thin-admin.css" rel="stylesheet" media="screen">
+<link href="/static/css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="/static/weathericons/css/weather-icons.css" rel="stylesheet" media="screen">
+    <link media="screen" rel="stylesheet" href="/static/font-awesome-4.0.3/css/font-awesome.min.css">
+<link href="/static/style/style.css" rel="stylesheet">
+<link href="/static/style/dashboard.css" rel="stylesheet">
+<link href="/static/assets/jquery-easy-pie-chart/jquery.easy-pie-chart.css" rel="stylesheet" type="text/css" media="screen"/>
+
+<!-- Notify CSS -->
+<!-- <link href="../static/css/bootstrap-notify/bootstrap-notify.css" rel="stylesheet"> -->
+<link href="/static/css/bootstrap-notify/bootstrap-notify.css" rel="stylesheet">
+
+<!-- Custom Styles -->
+<link href="/static/css/bootstrap-notify/styles/alert-bangtidy.css" rel="stylesheet">
+<link href="/static/css/bootstrap-notify/styles/alert-blackgloss.css" rel="stylesheet">
+
+<link href="/static/css/jquery-ui.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/static/assets/slider_enhancer/jquery-ui-slider-pips.css">
+<!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+    <script class="include" type="text/javascript" src="/static/javascript/jquery.min.js"></script>
+<script>
+    var device_info = "{{device_zone}}/thermostat/{{device_id}}";
+    var device_id = "{{ device_id }}";
+    var zone = {{ device_zone }};
+    var role = "{{ request.user.get_profile.group.name|lower }}";
+    {% ifnotequal request.user.get_profile.zone.zone_id None %}
+    var uzone = {{ request.user.get_profile.zone.zone_id }};
+    {% else  %}
+    var uzone = 9999;
+    {% endifnotequal %}
+    var device_type_id = "{{ device_type_id }}";
+    var override_th = "{{ override }}";
+    var mode = "{{ device_data.thermostat_mode }}";
+    var fan_mode = "{{ device_data.fan_mode }}";
+    var temperature = "{{ device_data.temperature }}";
+    var heat_setpoint = "{{ device_data.heat_setpoint }}";
+    var cool_setpoint = "{{ device_data.cool_setpoint }}";
+</script>
+</head>
+<body>
+{% include 'top_nav.html' %}
+<div class="wrapper">
+{% include 'side_nav.html' %}
+  <div class="page-content">
+  	<form action="" method="post">
+  	{% csrf_token %}
+    <div class="content container">
+        <div class="row">
+        <div class="col-lg-12">
+          <h2 class="page-title">{{zone_nickname}} : {{device_nickname}}</h2>
+        </div>
+      </div>
+        <div class="row">
+            <div class="col-md-6 col-xs-12 col-sm-6">
+                {% if device_type_id == '1NST' %}
+            <a href="#" class="stats-container" >
+              <div class="stats-heading">Battery Level</div>
+              <div class="stats-body-alt">
+                <div class="progress" style="width: 100%;">
+                  <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{ device_data.battery }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ device_data.battery }}%">
+                <span class="sr-only">{{ device_data.battery }} %</span>
+              </div></div>
+                  <h4 class="text-center" id="battery_lvl">{{ device_data.battery }} %</h4>
+                 </div>
+
+              </a> {% endif %}
+            {% if device_type_id != '1NST' %} <br/><br/><br/>{% endif %}
+                <a href="#" class="stats-container" >
+              <div class="stats-heading">Indoor Temperature</div>
+              <div class="stats-body-alt" >
+                <div class="text-center"><span class="h1" id="indoor_temp">{{ device_data.temperature }}</span><span class="h1">&deg;F</span></div>
+              </div>
+              </a>
+
+            </div>
+          <div class="col-lg-6 col-xs-12 col-sm-6">
+          <div class="widget-container" id = "weather_widget">
+            <div class="padded"> <i class="icon-map-marker pull-right"></i> <span class="h4" id="locateion">{{location}}</span>
+            	<br/>
+              <div class="text-center padder m-t"> <span class="h1" id="iconandtemp"><i class="{{ weather_icon }}"></i> {{temp_f}}&deg;F</span> </div>
+            </div>
+            <div class="text-center padder m-t"> <span class="h4" id="weather">{{ weather }}</span> </div><br/>
+            <div class="widget-footer lt">
+              <div class="row">
+                <div class="col-xs-4"> <small class="text-muted block">Humidity</small> <span id="humidity">{{humidity}}</span> </div>
+                <div class="col-xs-4"> <small class="text-muted block">Precipitation</small> <span id="precip">{{precip}} in.</span> </div>
+                <div class="col-xs-4"> <small class="text-muted block">Winds</small> <span id="winds">{{winds}} mph</span> </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        </div>
+     <div class="row">
+            <div class="col-md-6 col-xs-12 col-sm-6" id="actt"> <a href="#" class="stats-container" >
+              <div class="stats-heading">Thermostat Mode</div>
+              <div class="stats-body-alt">
+                <div class="text-center">
+                    <button class="btn btn-default btn-lg" type="button" id="th_heat" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}><i class="shortcut-icon icon-fire"></i>  Heat</button>&nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default btn-lg" type="button" id="th_cool" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}><i class="shortcut-icon icon-tint"></i>  Cool</button>&nbsp;&nbsp;&nbsp;
+                     <button class="btn btn-default btn-lg" type="button" id="th_off" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}><i class="shortcut-icon icon-off"></i>  Off</button>
+                </div>
+                </div>
+              <div class="stats-footer">#</div>
+              </a> </div>
+            <div class="col-md-6 col-xs-12 col-sm-6" id="actt1"> <a href="#" class="stats-container">
+              <div class="stats-heading">Fan Mode</div>
+              <div class="stats-body-alt">
+                <div class="text-center">
+                    <button class="btn btn-default btn-lg" type="button" id="fan_auto" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}><i class="shortcut-icon icon-leaf"></i>  Auto</button>&nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-default btn-lg" type="button" id="fan_on" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}><i class="shortcut-icon icon-off"></i>  On</button>&nbsp;&nbsp;&nbsp;
+                </div>
+                </div>
+              <div class="stats-footer">#</div>
+              </a> </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-xs-12 col-sm-6" id="actt"> <a href="#" class="stats-container" >
+              <div class="stats-heading">Heat SetPoint</div>
+              <div class="stats-body-alt">
+                <div class="text-center">
+                    <span class="h1" id="heat_setpoint">{{ device_data.heat_setpoint }}</span><span class="h1">&deg;F</span>
+                    <button class="btn btn-warning" id="heatplus" type="button"
+                            {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                            ><span class="h4">+</span></button>
+                    <button class="btn btn-info" id="heatminus" type="button"
+                            {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                            ><span class="h4">-</span></button>
+                </div>
+                </div>
+              <div class="stats-footer">#</div>
+              </a> </div>
+            <div class="col-md-4 col-xs-12 col-sm-6" id="actt1"> <a href="#" class="stats-container">
+              <div class="stats-heading">Cool SetPoint</div>
+              <div class="stats-body-alt">
+                <div class="text-center">
+                    <span class="h1" id="cool_setpoint">{{ device_data.cool_setpoint }}</span><span class="h1">&deg;F</span>
+                    <button class="btn btn-warning" id="coolplus" type="button"
+                            {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                            ><span class="h4">+</span></button>
+                    <button class="btn btn-info" id="coolminus" type="button"
+                            {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                            ><span class="h4">-</span></button>
+                </div>
+                </div>
+              <div class="stats-footer">#</div>
+              </a> </div>
+        <div class="col-md-4 col-xs-12 col-sm-6" id="actt1"> <a href="#" class="stats-container">
+              <div class="stats-heading">Allow Override</div>
+              <div class="stats-body-alt">
+                <div class="text-center">
+                    <button class="btn btn-default" id="override_yes" type="button"
+                            {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                            ><span class="h4">YES</span></button>
+                    <button class="btn btn-default" id="override_no" type="button"
+                            {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                            ><span class="h4">NO</span></button>
+                </div>
+                </div>
+              <div class="stats-footer">#</div>
+              </a> </div>
+
+        </div>
+        <div class="row">
+            <div class="text-center">
+                {% if request.user.get_profile.group.name|lower == 'admin' or request.user.get_profile.zone.zone_id ==  device_zone  %}
+
+                    <button type="button" class="btn btn-default" id="submitthermostatdata"><i class="icon-ok"></i>Submit All Changes</button>
+                    <a href="/th_schedule/{{ mac }}">
+                        <button type="button" class="btn btn-default btn-primary" ><i class="icon-bar-chart"></i> Set Schedule</button>
+                    </a>
+
+                {% endif %}
+                    <a href="/th_statistics/{{ mac }}">
+                        <button type="button" class="btn btn-default btn-danger" ><i class="icon-bar-chart"></i> View Past Usage and Set Points</button>
+                    </a>
+                    <!--<a href="/th_schedule/{{ mac }}">
+                        <button type="button" class="btn btn-default btn-primary" ><i class="icon-bar-chart"></i> Set Schedule</button>
+                    </a>-->
+
+            </div>
+        </div>
+      	</div>
+
+	</form>
+    </div>
+  </div>
+
+
+<div class="bottom-nav footer"> <span class="h6"> 2013-2015 &copy;: Building Energy Management Open Source Software. </span><br/></div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script src="/static/js/jquery.js"></script> 
+<script src="/static/js/bootstrap.min.js"></script> 
+<script type="text/javascript" src="/static/js/left_nav_slider.js"></script>
+<script src="/static/js/select-checkbox.js"></script> 
+<script src="/static/js/to-do-admin.js"></script>
+<script class="include" type="text/javascript" src="/static/javascript/jquery-1.10.2.js"></script>
+<script class="include" type="text/javascript" src="/static/javascript/ui/jquery-ui.js"></script>
+<script src="/static/assets/slider_enhancer/jquery-ui-slider-pips.min.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.min.js"></script>
+          <script class="include" type="text/javascript" src="/static/app_js/bootstrap-notify.js"></script>
+          <script class="include" type="text/javascript" src="/static/app_js/thermostat.js"></script>
+<script type="text/javascript" src="/static/app_js/make_current.js"></script>
+<!--switcher html start-->
+{% include 'theme_changer.html' %}
+</body>
+</html>

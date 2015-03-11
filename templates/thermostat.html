@@ -1,0 +1,535 @@
+
+<!--
+
+# Authors: Kruthika Rathinavel
+# Version: 1.2.1
+# Email: kruthika@vt.edu
+# Created: "2014-10-13 18:45:40"
+# Updated: "2015-02-13 15:06:41"
+
+
+Copyright © 2014 by Virginia Polytechnic Institute and State University
+All rights reserved
+
+Virginia Polytechnic Institute and State University (Virginia Tech) owns the copyright for the BEMOSS software and its
+associated documentation ("Software") and retains rights to grant research rights under patents related to
+the BEMOSS software to other academic institutions or non-profit research institutions.
+You should carefully read the following terms and conditions before using this software.
+Your use of this Software indicates your acceptance of this license agreement and all terms and conditions.
+
+You are hereby licensed to use the Software for Non-Commercial Purpose only.  Non-Commercial Purpose means the
+use of the Software solely for research.  Non-Commercial Purpose excludes, without limitation, any use of
+the Software, as part of, or in any way in connection with a product or service which is sold, offered for sale,
+licensed, leased, loaned, or rented.  Permission to use, copy, modify, and distribute this compilation
+for Non-Commercial Purpose to other academic institutions or non-profit research institutions is hereby granted
+without fee, subject to the following terms of this license.
+
+Commercial Use: If you desire to use the software for profit-making or commercial purposes,
+you agree to negotiate in good faith a license with Virginia Tech prior to such profit-making or commercial use.
+Virginia Tech shall have no obligation to grant such license to you, and may grant exclusive or non-exclusive
+licenses to others. You may contact the following by email to discuss commercial use:: vtippatents@vtip.org
+
+Limitation of Liability: IN NO EVENT WILL VIRGINIA TECH, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF VIRGINIA TECH OR OTHER PARTY HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+For full terms and conditions, please visit https://bitbucket.org/bemoss/bemoss_os.
+
+Address all correspondence regarding this license to Virginia Tech's electronic mail address:: vtippatents@vtip.org
+
+
+    -->
+{% load dashboard_extras %}
+{% load switch_case %}
+{% load device_count_in_zone %}
+{% load timedelta %}
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>BEMOSS - Thermostat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap -->
+<link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="/static/css/thin-admin.css" rel="stylesheet" media="screen">
+<link href="/static/css/font-awesome.css" rel="stylesheet" media="screen">
+        <link media="screen" rel="stylesheet" href="/static/font-awesome-4.0.3/css/font-awesome.min.css">
+<link href="/static/weathericons/css/weather-icons.css" rel="stylesheet" media="screen">
+<link href="/static/style/style.css" rel="stylesheet">
+<link href="/static/style/dashboard.css" rel="stylesheet">
+<link href="/static/assets/jquery-easy-pie-chart/jquery.easy-pie-chart.css" rel="stylesheet" type="text/css" media="screen"/>
+
+<!-- Notify CSS -->
+<!-- <link href="../static/css/bootstrap-notify/bootstrap-notify.css" rel="stylesheet"> -->
+<link href="/static/css/bootstrap-notify/bootstrap-notify.css" rel="stylesheet">
+
+<!-- Custom Styles -->
+<!-- <link href="../static/css/bootstrap-notify/styles/alert-bangtidy.css" rel="stylesheet">
+<link href="../static/css/bootstrap-notify/styles/alert-blackgloss.css" rel="stylesheet"> -->
+<link href="/static/css/bootstrap-notify/styles/alert-bangtidy.css" rel="stylesheet">
+<link href="/static/css/bootstrap-notify/styles/alert-blackgloss.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+    <script class="include" type="text/javascript" src="/static/javascript/jquery.min.js"></script> 
+
+<script>
+    /* $( document ).ready(function() {
+     var ws = new WebSocket("ws://localhost:8080/socket_thermostat");
+     ws.onopen = function () {
+         ws.send("WS opened from html page");
+     };
+     ws.onmessage = function (event) {
+         //$('#main').append('<div>' + event.data + '</div>');
+         console.log(event.data);
+     };
+ });*/
+	//Weather Details
+	//var location = "{{ location }}"
+	var temp_f = "{{ temp_f }}";
+	var weather = "{{ weather }}";
+	var humidity = "{{ humidity }}";
+	var precip = "{{ precip }}";
+	var winds = "{{ winds }}";
+	var icon = "{{ weather_icon }}";
+
+	//Thermostat 
+	var tmode = "{{ tmode }}";
+	var fmode = "{{ fmode }}";
+	//var hold = "{{ hold }}";
+	var t_cool = parseFloat("{{ t_cool }}");
+	var t_heat = parseFloat("{{ t_heat }}");
+    var device_info = "{{device_zone}}/thermostat/{{device_id}}";
+    var device_id = "{{ device_id }}";
+
+	
+	//var before_update = '{'tmode+','+fmode+','+hold+','+t_cool+','+t_heat+'}';
+	//alert (before_update);
+	
+	$(onStart); //short-hand for $(document).ready(onStart);  
+	function onStart($) {  
+    //alert(tmode);
+    switch(tmode)
+	{
+	case 'OFF':
+	  $("#shortcutoff").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;
+	case 'HEAT':
+	  $("#shortcutheat").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;
+	case 'COOL':
+	  $("#shortcutcool").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;
+	/*case 'AUTO':
+	  $("#shortcutauto").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;*/
+	} 
+	
+	//alert(fmode);
+    switch(fmode)
+	{
+	case 'AUTO':
+	  $("#fanauto").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;
+	/*case 'CIRCULATE':
+	  $("#fancirculate").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;*/
+	case 'ON':
+	  $("#fanoff").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;
+	} 
+	
+	//alert(hold);
+    /*switch(hold)
+	{
+	case '1':
+	  $("#hold").css('background-color','rgba(0, 128, 0, 0.50)');
+	  break;
+	default:
+	  $("#hold").css('background-color','rgba(0, 128, 0, 0.40)');
+	  break;
+	} */
+    
+    
+}
+
+</script>
+
+</head>
+<body>
+          <div class='notifications top-right'></div>
+          <div class='notifications bottom-right'></div>
+          <div class='notifications top-left'></div>
+          <div class='notifications bottom-left'></div>
+<div class="container">
+  <div class="top-navbar header b-b"> <a data-original-title="Toggle navigation" class="toggle-side-nav pull-left" href="#"><i class="icon-reorder"></i> </a>
+    <div class="brand pull-left"> <a href="/home/"><img src="/static/images/logo.png" width="147" height="33"></a></div>
+    <ul class="nav navbar-nav navbar-right  hidden-xs">
+      {% if request.user.get_profile.group.name|lower == 'admin' %}
+         <li class="dropdown"> <a data-toggle="dropdown" class="dropdown-toggle" href="#"> <i class="icon-warning-sign"></i> <span class="badge">{{ active_al|length }}</span> </a>
+        <ul class="dropdown-menu extended notification">
+          <li class="title">
+            <p>You have {{ active_al|length }} new notification(s)</p>
+          </li>
+          {% for al in active_al %}
+              <li>
+                 <a href="#">
+                 {% ifequal al.reg_alert.priority.priority 'Low'%}
+                 <span class="label label-success"><i class="icon-plus"></i></span>
+                 {% endifequal %}
+                 {% ifequal al.reg_alert.priority.priority 'Warn'%}
+                 <span class="label label-warning"><i class="icon-bolt"></i></span>
+                 {% endifequal %}
+                 {% ifequal al.reg_alert.priority.priority 'Critical'%}
+                 <span class="label label-danger"><i class="icon-warning-sign"></i></span>
+                 {% endifequal %}
+                 <span class="message">{{ al.reg_alert.alarm.alarm_desc }} {{ al.reg_alert.value }}
+                 {% ifequal al.reg_alert.alarm_type.id 2 %}
+                     &deg;F
+                 {% endifequal %}
+                 </span><span class="time">{{ al.active_dt|timedelta }}</span> </a>
+              </li>
+          {% endfor %}
+
+          <!--<li> <a href="#"> <span class="label label-success"><i class="icon-plus"></i></span> <span class="message">New user registration.</span> <span class="time">1 mins</span> </a> </li>
+          <li> <a href="#"> <span class="label label-danger"><i class="icon-warning-sign"></i></span> <span class="message">High CPU load on cluster #2.</span> <span class="time">5 mins</span> </a> </li>
+          <li> <a href="#"> <span class="label label-success"><i class="icon-plus"></i></span> <span class="message">New user registration.</span> <span class="time">10 mins</span> </a> </li>
+          <li> <a href="#"> <span class="label label-info"><i class="icon-bullhorn"></i></span> <span class="message">New items are in queue.</span> <span class="time">25 mins</span> </a> </li>
+          <li> <a href="#"> <span class="label label-warning"><i class="icon-bolt"></i></span> <span class="message">Disk space to 85% full.</span> <span class="time">35 mins</span> </a> </li>-->
+          <li class="footer"> <a href="#">View all notifications</a> </li>
+        </ul>
+      </li>
+      {% endif %}
+      <li class="dropdown user  hidden-xs"> <a data-toggle="dropdown" class="dropdown-toggle" href="#"> <i class="icon-male"></i>
+          <span class="username">
+          {% ifequal request.user.first_name '' %}
+              {{ user }}
+          {% else %}
+              {{request.user.first_name }} {{ request.user.last_name }}
+          {% endifequal %}
+          </span>
+           </a>
+        <li><a href="/logout/"><i class="icon-power-off"></i> Log Out</a></li>
+      </li>
+    </ul>
+
+  </div>
+</div>
+<div class="wrapper">
+{% include 'side_nav.html' %}
+  <div class="page-content">
+  	<form action="" method="post">
+  	{% csrf_token %}
+    <div class="content container">
+      <div class="row">
+        <div class="col-lg-12">  
+          <h2 class="page-title">{{zone_nickname}} : {{device_nickname}}</h2>
+        </div>
+      </div>
+      <div class="row">
+      	<div class="col-lg-3"></div>
+      	<div class="col-lg-3"></div>
+      	<div class="col-lg-3">
+      		<!--<div class="widget-container">-->
+            <div class="padded"> <a href="#" class="pull-right"></a> <span class="h4"> Indoor Temperature</span>
+            	
+              <div class="text-center padder m-t"> <br/><span class="h1" id="indoortemp" >{{temp}}&deg;F</span> </div>
+            <br/>
+            <br/>
+          </div>
+      	</div>
+      	</div>
+      	<div class="row">
+        <div class="col-lg-6">
+          <div class="widget">
+            <div class="widget-header"> <i class="icon-bookmark"></i>
+              <h3>Mode</h3>
+            </div>
+            <!-- /widget-header -->
+            <div class="widget-content">
+              <div class="shortcuts"> 
+              	<a class="shortcut" id="shortcutheat" href="javascript:" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}>
+              		<i class="shortcut-icon icon-fire"></i>
+              		<span class="shortcut-label">Heat</span> 
+              	</a>
+                <a class="shortcut" id="shortcutcool" href="javascript:"
+                        {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                        >
+                	<i class="shortcut-icon icon-tint"></i>
+                	<span class="shortcut-label">Cool</span> 
+                </a>
+                <!--<a class="shortcut" id="shortcutauto" href="javascript:;">
+                	<i class="shortcut-icon icon-leaf"></i> 
+                	<span class="shortcut-label">Auto</span> 
+                </a>-->
+                <a class="shortcut" id="shortcutoff" href="javascript:"
+                        {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                        >
+                	<i class="shortcut-icon icon-off"></i>
+                	<span class="shortcut-label">Off</span> 
+                </a>
+                </div>
+              <!-- /shortcuts --> 
+            </div>
+            <!-- /widget-content --> 
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="widget-container">
+            <div class="padded"> <i class="icon-map-marker pull-right"></i> <span class="h4" id="locateion">{{location}}</span>
+            	<br/>
+              <div class="text-center padder m-t"> <span class="h1" id="iconandtemp"><i class="{{ weather_icon }}"></i> {{temp_f}}&deg;F</span> </div>
+            </div>
+            <div class="text-center padder m-t"> <span class="h4" id="weather">{{ weather }}</span> </div><br/>
+            <div class="widget-footer lt">
+              <div class="row">
+                <div class="col-xs-4"> <small class="text-muted block">Humidity</small> <span id="humidity">{{humidity}}</span> </div>
+                <div class="col-xs-4"> <small class="text-muted block">Precipitation</small> <span id="precip">{{precip}} in.</span> </div>
+                <div class="col-xs-4"> <small class="text-muted block">Winds</small> <span id="winds">{{winds}} mph</span> </div>
+              </div>
+            </div>
+            
+          </div>
+          
+        </div>
+      	</div>
+      <div class="row">
+      	<div class="col-lg-5">
+      		<div class="widget">
+            <div class="widget-header"> <i class="icon-bookmark"></i>
+              <h3>Fan</h3>
+            </div>
+            <!-- /widget-header -->
+            <div class="widget-content">
+              <div class="shortcuts"> 
+                <!--<a class="shortcut" id="fancirculate" href="javascript:;">
+                	<i class="shortcut-icon icon-retweet"></i>
+                	<span class="shortcut-label">Circulate</span> 
+                </a>-->
+                <a class="shortcut" id="fanauto" href="javascript:">
+                	<i class="shortcut-icon icon-leaf"></i> 
+                	<span class="shortcut-label">Auto</span> 
+                </a>
+                <a class="shortcut" id="fanoff" href="javascript:">
+                	<i class="shortcut-icon icon-off"></i>
+                	<span class="shortcut-label">On</span>
+                </a>
+                </div>
+              <!-- /shortcuts --> 
+            </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+  		<div class="widget-container">
+  			<br/>
+              <div class="shortcuts"> 
+              {% ifequal tmode 'HEAT' %}
+                <a class="shortcut" id="shortcuthsp" href="javascript:">
+                	<span class="shortcut-label">Heat Set Point</span><br/>
+                	<span class="h3" id="heatvalue">{{t_heat}}</span>&deg;<span class="h3">F</span><br/><br/>
+                	<div class="btn-group m-b-sm">
+						<button class="btn btn-default" id="heatminus" type="button" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}>-</button>
+						<button class="btn btn-default" id="heatplus" type="button" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}>+</button>
+					</div>
+                </a>
+                <a class="shortcut" id="shortcutcsp" href="javascript:" style="background-color:rgba(255, 255, 255, 0.4);">
+                	<span class="shortcut-label">Cool Set Point</span><br/>
+                	<span class="h3" id="coolvalue">{{ t_cool }}</span>&deg;<span class="h3">F</span> <br/><br/>
+                	<div class="btn-group m-b-sm">
+						<button class="btn btn-default" id="coolminus" type="button" disabled="disabled">-</button>
+						<button class="btn btn-default" id="coolplus" type="button" disabled="disabled">+</button>
+					</div>
+                </a>
+                {% endifequal %}
+                {% ifequal tmode 'COOL' %}
+                <a class="shortcut" id="shortcuthsp" href="javascript:" style="background-color:rgba(255, 255, 255, 0.4);">
+                	<span class="shortcut-label">Heat Set Point</span><br/>
+                	<span class="h3" id="heatvalue">{{ t_heat }}</span>&deg;<span class="h3">F</span><br/><br/>
+                	<div class="btn-group m-b-sm">
+						<button class="btn btn-default" id="heatminus" type="button" disabled="disabled">-</button>
+						<button class="btn btn-default" id="heatplus" type="button" disabled="disabled">+</button>
+					</div>
+                </a>
+                <a class="shortcut" id="shortcutcsp" href="javascript:" >
+                	<span class="shortcut-label">Cool Set Point</span><br/>
+                	<span class="h3" id="coolvalue">{{ t_cool }}</span>&deg;<span class="h3">F</span> <br/><br/>
+                	<div class="btn-group m-b-sm">
+						<button class="btn btn-default" id="coolminus" type="button" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %} >-</button>
+						<button class="btn btn-default" id="coolplus" type="button" {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}>+</button>
+					</div>
+                </a>
+                {% endifequal %}
+                {% if tmode == 'OFF' %}
+                <a class="shortcut" id="shortcuthsp" href="javascript:" style="background-color:rgba(255, 255, 255, 0.4);">
+                	<span class="shortcut-label">Heat Set Point</span><br/>
+                	<span class="h3" id="heatvalue">{{ t_heat }}</span>&deg;<span class="h3">F</span><br/><br/>
+                	<div class="btn-group m-b-sm">
+						<button class="btn btn-default" id="heatminus" type="button" disabled="disabled">-</button>
+						<button class="btn btn-default" id="heatplus" type="button" disabled="disabled">+</button>
+					</div>
+                </a>
+                <a class="shortcut" id="shortcutcsp" href="javascript:" style="background-color:rgba(255, 255, 255, 0.4);">
+                	<span class="shortcut-label">Cool Set Point</span><br/>
+                	<span class="h3" id="coolvalue">{{ t_cool }}</span> &deg;<span class="h3">F</span><br/><br/>
+                	<div class="btn-group m-b-sm">
+						<button class="btn btn-default" id="coolminus" type="button" disabled="disabled">-</button>
+						<button class="btn btn-default" id="coolplus" type="button" disabled="disabled">+</button>
+					</div>
+                </a>
+                {% endif %}
+                </div>
+              <!-- /shortcuts --> 
+            
+      </div>
+  	</div>
+  	<div class="col-lg-3">
+  		<div class="widget-container">
+  			<br/><br/>
+              <div class="shortcuts"> 
+                <!--<a class="shortcut" id ="hold" style="background-color:rgba(255, 255, 255, 0.4);">
+                	<br/>
+                	<i class="shortcut-icon icon-stop"></i><br/>
+                	<span class="shortcut-label">Hold</span><br/>
+                </a>-->
+                <!--<a class="shortcut"  href="/schedule/">-->
+                  <a class="shortcut" href="/th_schedule/{{ mac_address }}"
+                          {% if request.user.get_profile.group.name|lower != 'admin' and request.user.get_profile.zone.zone_id !=  device_zone  %} disabled
+                        {% endif %}
+                          >
+                	<br/>
+                	<i class="shortcut-icon icon-calendar"></i> <br/>
+                	<span class="shortcut-label">Schedule</span><br/>
+                </a>
+                <br/><br/>
+                </div>
+              <!-- /shortcuts --> 
+            
+      </div>
+  	</div>
+      </div>
+      	</div>
+      	
+<div class="row">
+	<div class="col-lg-4"></div>
+     <div class="col-lg-4">
+          <div class="widgetcontainer">
+
+              <div class="todo-action-bar"> 
+                <!--row start-->
+                <div class="row">
+                    {% if request.user.get_profile.group.name|lower == 'admin' or request.user.get_profile.zone.zone_id ==  device_zone  %}
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-default" id="submitthermostatdata"><i class="icon-ok"></i> Submit All Changes</button>
+{% endif %}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/th_statistics/{{ mac }}"><button type="button" class="btn btn-default btn-danger" ><i class="icon-bar-chart"></i> View Past Usage and Set Points</button></a>
+
+                </div>
+                <!--row end--> 
+              </div>
+            </div>
+          </div>
+</div><br/>
+	</form>
+    </div>
+  </div>
+
+
+<div class="bottom-nav footer"> <span class="h6"> 2013-2015 &copy;: Building Energy Management Open Source Software. </span><br/></div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script src="/static/js/jquery.js"></script> 
+<script src="/static/js/bootstrap.min.js"></script> 
+<script type="text/javascript" src="/static/js/left_nav_slider.js"></script>
+<script class="include" type="text/javascript" src="/static/javascript/jquery191.min.js"></script> 
+<script class="include" type="text/javascript" src="/static/javascript/jquery.jqplot.min.js"></script> 
+<script src="/static/js/select-checkbox.js"></script> 
+<script src="/static/js/to-do-admin.js"></script> 
+<script src="/static/assets/sparkline/jquery.sparkline.js" type="text/javascript"></script>
+<script src="/static/assets/sparkline/jquery.customSelect.min.js" ></script>
+<script src="/static/assets/sparkline/sparkline-chart.js"></script>
+<script src="/static/assets/sparkline/easy-pie-chart.js"></script>
+<script class="include" type="text/javascript" src="/static/javascript/jquery.min.js"></script> 
+<!--<script class="include" type="text/javascript" src="/static/app_js/wifi3m50.js"></script>-->
+<script class="include" type="text/javascript" src="/static/assets/thermostat.js"></script>
+
+<script class="include" type="text/javascript" src="/static/app_js/jquery.csrftoken.min.js"></script>
+<script class="include" type="text/javascript" src="/static/app_js/bootstrap-notify.js"></script>
+<script class="include" type="text/javascript" src="/static/js/require.js"></script>
+
+<!--switcher html start-->
+<div class="demo_changer" style="right: -145px;">
+                <div class="demo-icon"></div>
+                <div class="form_holder">
+
+
+                    <div class="predefined_styles">
+                        <a class="styleswitch" rel="a" href=""><img alt="" src="/static/images/a.jpg"></a>
+                        <a class="styleswitch" rel="b" href=""><img alt="" src="/static/images/b.jpg"></a>
+                        <a class="styleswitch" rel="c" href=""><img alt="" src="/static/images/c.jpg"></a>
+                        <a class="styleswitch" rel="d" href=""><img alt="" src="/static/images/d.jpg"></a>
+                        <a class="styleswitch" rel="e" href=""><img alt="" src="/static/images/e.jpg"></a>
+                        <a class="styleswitch" rel="f" href=""><img alt="" src="/static/images/f.jpg"></a>
+                        <a class="styleswitch" rel="g" href=""><img alt="" src="/static/images/g.jpg"></a>
+                        <a class="styleswitch" rel="h" href=""><img alt="" src="/static/images/h.jpg"></a>
+                        <a class="styleswitch" rel="i" href=""><img alt="" src="/static/images/i.jpg"></a>
+                        <a class="styleswitch" rel="j" href=""><img alt="" src="/static/images/j.jpg"></a>
+                        <a class="styleswitch" rel="b1" href=""><img alt="" src="/static/images/b1.jpg"></a>
+                         <a class="styleswitch" rel="k" href=""><img alt="" src="/static/images/k.jpg"></a>
+                         <a class="styleswitch" rel="l" href=""><img alt="" src="/static/images/l.jpg"></a>
+                         <a class="styleswitch" rel="m" href=""><img alt="" src="/static/images/m.jpg"></a>
+                         <a class="styleswitch" rel="n" href=""><img alt="" src="/static/images/n.jpg"></a>
+                         <a class="styleswitch" rel="o" href=""><img alt="" src="/static/images/o.jpg"></a>
+                         <a class="styleswitch" rel="p" href=""><img alt="" src="/static/images/p.jpg"></a>
+                         <a class="styleswitch" rel="q" href=""><img alt="" src="/static/images/q.jpg"></a>
+                         <a class="styleswitch" rel="r" href=""><img alt="" src="/static/images/r.jpg"></a>
+                         <a class="styleswitch" rel="s" href=""><img alt="" src="/static/images/s.jpg"></a>
+                         <a class="styleswitch" rel="t" href=""><img alt="" src="/static/images/t.jpg"></a>
+                         <a class="styleswitch" rel="u" href=""><img alt="" src="/static/images/u.jpg"></a>
+                    </div>
+
+                </div>
+            </div>
+
+
+    <!--switcher html end-->
+<script src="/static/assets/switcher/switcher.js"></script>
+<script src="/static/assets/switcher/moderziner.custom.js"></script>
+<link href="/static/assets/switcher/switcher.css" rel="stylesheet">
+<link href="/static/assets/switcher/switcher-defult.css" rel="stylesheet">
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/a.css" title="a" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/b.css" title="b" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/c.css" title="c" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/d.css" title="d" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/e.css" title="e" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/f.css" title="f" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/g.css" title="g" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/h.css" title="h" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/i.css" title="i" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/j.css" title="j" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/b1.css" title="b1" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/k.css" title="k" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/l.css" title="l" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/m.css" title="m" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/n.css" title="n" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/o.css" title="o" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/p.css" title="p" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/q.css" title="q" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/r.css" title="r" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/s.css" title="s" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/t.css" title="t" media="all" />
+<link rel="alternate stylesheet" type="text/css" href="/static/assets/switcher/u.css" title="u" media="all" />
+
+
+</body>
+</html>
